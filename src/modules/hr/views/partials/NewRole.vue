@@ -20,7 +20,6 @@ const props = defineProps(
 
 // #------------- Reactive & Refs State -------------#
 const roleForm = ref(null)
-let permissions = ref()
 const { fetchPermissions, permissionsList, createRole, success, updateRoleDetails } = useRole()
 const form = ref({
   name: '',
@@ -31,14 +30,13 @@ const form = ref({
 onMounted(() => {
   fetchPermissions()
 })
-watch(() => props.roleDetails, (newVal, oldVal) => {
+watch(() => props.roleDetails, (newVal) => {
   if (newVal) {
     form.value = {
       id: newVal?.id,
       name: newVal?.name,
-      //permission_ids: newVal.permissions
+      permission_ids: newVal?.permissions?.map(p => p.id) || []
     }
-    permissions.value = newVal?.permissions
   }
 },
   { deep: true, immediate: true } // optional
@@ -73,18 +71,9 @@ const updateRole = () => {
   })
 }
 
-const checkIfRoleAssigned = (roleId) => {
-  if (permissions.value) {
-     return permissions.value.some(item => item?.id === roleId)
-  } else {
-    return false
-  }
-}
-
 </script>
 
 <template>
-  role details {{props.roleDetails?.permissions}}
   <el-form :model="form" ref="roleForm" label-width="auto" label-position="top">
     <el-row :gutter="20">
       <el-col :span="24">
@@ -96,7 +85,6 @@ const checkIfRoleAssigned = (roleId) => {
             <el-checkbox
               v-for="(item, index) in permissionsList" :key="index"
               :label="removeUnderscore(item.name)" :value="item.id"
-              :checked="checkIfRoleAssigned(item.id)"
               style="width: 30%"
             />
           </el-checkbox-group>

@@ -16,6 +16,14 @@ export const dashboardRoutes = [
           requiresAuth: true,
           permissions: ['VIEW_DASHBOARD'],
         },
+      },
+      {
+        path: '/my-profile',
+        component: () => import('../views/MyProfile.vue'),
+        meta: {
+          title: 'My Profile',
+          requiresAuth: true,
+        },
       }
     ]
   }

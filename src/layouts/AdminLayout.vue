@@ -35,12 +35,10 @@ const logout = () => {
 
         <!-- Right section -->
         <div class="flex items-center gap-3">
-          <button class="text-white hover:bg-slate-700 p-2 rounded hidden sm:flex items-center gap-1">
+          <RouterLink to="/my-profile" class="text-white hover:bg-pink-500 p-2 rounded hidden sm:flex items-center gap-1">
+            <Icon icon="mdi-light:account" width="24" height="24" />
             <span class="text-sm">My Profile</span>
-            <svg class="h-3 w-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path>
-            </svg>
-          </button>
+          </RouterLink>
 
           <button
             class="text-white hover:cursor-pointer hover:bg-pink-500 p-2 rounded
@@ -56,7 +54,7 @@ const logout = () => {
       <!-- Secondary Navigation -->
       <nav class="mt-3 pt-3 border-t border-gray-200">
         <div class="flex gap-4 text-sm overflow-x-hidden">
-          <RouterLink to="/home" class="text-gray-300 hover:text-white transition-colors duration-200">Home</RouterLink>
+          <RouterLink to="/home" class="text-gray-300 hover:text-white transition-colors duration-200 flex gap-1 items-center"><Icon icon="mdi-light:home" width="17" height="17" /> Home</RouterLink>
           <a v-if="hasPermission('VIEW_SALES_MODULE')" href="#" class="text-gray-300 hover:text-white transition-colors duration-200">Sales</a>
           <a v-if="hasPermission('VIEW_INVENTORY_MODULE')" href="#" class="text-gray-300 hover:text-white transition-colors duration-200">Inventory</a>
           <a v-if="hasPermission('VIEW_SUPPLIERS_MODULE')" href="#" class="text-gray-300 hover:text-white transition-colors duration-200">Suppliers</a>

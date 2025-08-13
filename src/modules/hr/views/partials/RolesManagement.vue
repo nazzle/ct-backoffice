@@ -4,6 +4,8 @@ import { dateFormatter } from '@/components/globals/constants.js'
 import { useRole } from '@/modules/hr/composables/useRole.js'
 import PageTitle from '@/components/globals/PageTitle.vue'
 import NewRole from '@/modules/hr/views/partials/NewRole.vue'
+import { ElMessageBox } from 'element-plus'
+import { hasPermission } from '@/utils/permissions.js'
 
 // #------------- Reactive & Refs State -------------#
 const roleFormVisible = ref(false)
@@ -15,7 +17,7 @@ const page = ref({
   totalPages: 1,
   number: 0,
 })
-const { fetchRoles, paginatedRoles } = useRole()
+const { fetchRoles, paginatedRoles, activateDeactivateRole, success } = useRole()
 
 // #------------- Watchers -------------#
 onMounted(() => {
@@ -37,6 +39,25 @@ const openRoleForm = (data) => {
 const completeCreateAction = () => {
   roleFormVisible.value = false
   fetchRoles()
+}
+
+const changeRoleStatus = (data) => {
+  const status = data.active ? 'deactivate' : 'activate'
+  ElMessageBox.confirm(
+    `Are you sure you want to ${status} this role?. Continue?`,
+    'Warning',
+    {
+      confirmButtonText: 'Yes! Continue',
+      cancelButtonText: 'Cancel',
+      type: 'warning',
+    }
+  )
+    .then(() => {
+      activateDeactivateRole(data?.id)
+      if(success.value) {
+        fetchRoles()
+      }
+    })
 }
 
 </script>
@@ -69,6 +90,7 @@ const completeCreateAction = () => {
           <el-table-column label="Actions">
             <template #default="scope">
               <el-button
+                v-if="hasPermission('UPDATE_ROLES')"
                 type="primary"
                 size="small"
                 plain
@@ -79,11 +101,13 @@ const completeCreateAction = () => {
                 <Icon icon="mdi-light:pencil" />
               </el-button>
               <el-button
+                v-if="hasPermission('UPDATE_ROLES')"
                 :type="scope.row.active ? 'danger' : 'primary'"
                 size="small"
                 plain
                 round
                 :title="scope.row.active ? 'Deactivate Employee' : 'Activate Employee'"
+                @click="changeRoleStatus(scope.row)"
               >
                 <Icon :icon="`mdi-light:${scope.row.active ? 'delete' : 'check-circle'}`" />
               </el-button>
