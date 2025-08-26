@@ -56,8 +56,8 @@ const logout = () => {
         <div class="flex gap-4 text-sm overflow-x-hidden">
           <RouterLink to="/home" class="text-gray-300 hover:text-white transition-colors duration-200 flex gap-1 items-center"><Icon icon="mdi-light:home" width="17" height="17" /> Home</RouterLink>
           <a v-if="hasPermission('VIEW_SALES_MODULE')" href="#" class="text-gray-300 hover:text-white transition-colors duration-200">Sales</a>
-          <a v-if="hasPermission('VIEW_INVENTORY_MODULE')" href="#" class="text-gray-300 hover:text-white transition-colors duration-200">Inventory</a>
-          <a v-if="hasPermission('VIEW_SUPPLIERS_MODULE')" href="#" class="text-gray-300 hover:text-white transition-colors duration-200">Suppliers</a>
+          <RouterLink to="/inventory/index" v-if="hasPermission('VIEW_INVENTORY_MODULE')" href="#" class="text-gray-300 hover:text-white transition-colors duration-200">Inventory</RouterLink>
+          <RouterLink to="/suppliers/index" v-if="hasPermission('VIEW_SUPPLIERS_MODULE')" href="#" class="text-gray-300 hover:text-white transition-colors duration-200">Suppliers</RouterLink>
           <RouterLink to="/human-resources/index" v-if="hasPermission('VIEW_HR_MODULE')" href="#" class="text-gray-300 hover:text-white transition-colors duration-200">Employees</RouterLink>
           <a v-if="hasPermission('VIEW_REPORTS_MODULE')" href="#" class="text-gray-300 hover:text-white transition-colors duration-200">Reports</a>
           <a v-if="hasPermission('VIEW_CONFIGURATIONS_MODULE')" href="#" class="text-gray-300 hover:text-white transition-colors duration-200">Configurations</a>

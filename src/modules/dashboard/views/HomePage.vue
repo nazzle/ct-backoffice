@@ -22,13 +22,13 @@ const modules = [
   {
     name: 'Inventory',
     logo: inventorySvg,
-    path: '/',
+    path: '/inventory/index',
     permissions: 'VIEW_INVENTORY_MODULE',
   },
   {
     name: 'Suppliers',
     logo: suppliersSvg,
-    path: '/',
+    path: '/suppliers/index',
     permissions: 'VIEW_SUPPLIERS_MODULE',
   },
   {
