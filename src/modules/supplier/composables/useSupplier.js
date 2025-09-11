@@ -1,6 +1,6 @@
 import { onMounted, ref } from 'vue'
 import { ElMessage } from 'element-plus'
-import { getSuppliers } from '@/modules/supplier/api/supplier.js'
+import { createSupplier, getSuppliers } from '@/modules/supplier/api/supplier.js'
 
 export function useSupplier() {
   const suppliers = ref([])
@@ -15,12 +15,33 @@ export function useSupplier() {
       const response = await getSuppliers()
       const responseObj = response.data
       if (responseObj.status === true) {
-        suppliers.value = responseObj?.data
+        suppliers.value = responseObj?.suppliers?.data
       } else {
         ElMessage.error("error")
       }
     } catch (error) {
       error.value = error.response?.data?.message || 'Failed to fetch suppliers'
+      ElMessage.error(error.value)
+    } finally {
+      loading.value = false
+    }
+  }
+
+  const saveSupplierDetails = async (data) => {
+    loading.value = true
+    try {
+      const response = await createSupplier(data.value)
+      const responseObj = response.data
+      if (responseObj.status === true) {
+        success.value = true
+        ElMessage.success(responseObj.message)
+      } else {
+        success.value = false
+        ElMessage.error("error")
+      }
+    } catch (error) {
+      success.value = false
+      error.value = error.response?.data?.errors?.code[0] || 'Failed to save suppliers details'
       ElMessage.error(error.value)
     } finally {
       loading.value = false
@@ -35,7 +56,8 @@ export function useSupplier() {
     error,
     success,
     allSuppliers,
-    fetchSuppliers
+    fetchSuppliers,
+    saveSupplierDetails,
   }
 
 }
