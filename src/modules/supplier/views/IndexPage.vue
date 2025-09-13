@@ -5,6 +5,7 @@ import { ref } from 'vue'
 import { hasPermission } from '@/utils/permissions.js'
 import { countries } from '@/utils/countries.js'
 import { dateFormatter } from '../../../components/globals/constants.js'
+import { ElMessage, ElMessageBox } from 'element-plus'
 
 // #------------- Props / Emits -------------#
 
@@ -20,7 +21,10 @@ const page = ref({
 const supplierFormVisible = ref(false)
 const supplierFormObj = ref({})
 const supplierForm = ref(null)
-const { suppliers, saveSupplierDetails, fetchSuppliers, success } = useSupplier()
+const {
+  suppliers, saveSupplierDetails, fetchSuppliers, success, updateSupplierDetails,
+  changeSupplierStatus,
+} = useSupplier()
 
 // #------------- Functions/Methods -------------#
 const indexNumber = (scope) => {
@@ -28,8 +32,16 @@ const indexNumber = (scope) => {
     ? Math.abs((page.value.number - 1) * page.value.size + scope.$index + 1)
     : scope.$index + 1
 }
-const openSupplierForm = (crudOption) => {
+const openSupplierForm = (crudOption, row) => {
   formTitle.value = crudOption === 'create' ? 'CREATE NEW SUPPLIER' : 'UPDATE SUPPLIER DETAILS'
+  if (crudOption === 'update') {
+    supplierFormObj.value = {
+      name: row?.name || '',
+      code: row?.code || '',
+      country: row?.country || '',
+      id: row?.id,
+    }
+  }
   supplierFormVisible.value = true
 }
 const submitSupplierDetails = () => {
@@ -42,6 +54,43 @@ const submitSupplierDetails = () => {
       }
     }
   })
+}
+
+const editSupplierDetails = () => {
+  supplierForm.value.validate(async (valid) => {
+    if (valid) {
+      await updateSupplierDetails(supplierFormObj)
+      if (success.value) {
+        await fetchSuppliers()
+        cancelSupplierForm()
+      }
+    }
+  })
+}
+
+const activateDeactivateSupplier = async (data) => {
+  const status = data?.active ? 'deactivate' : 'activate'
+  if (data) {
+    ElMessageBox.confirm(
+      `This action will ${status} this supplier. Continue?`,
+      'Warning',
+      {
+        confirmButtonText: 'OK',
+        cancelButtonText: 'Cancel',
+        type: 'warning',
+      }
+    ).then(async () => {
+      await changeSupplierStatus(data)
+      if (success.value) {
+        await fetchSuppliers()
+      }
+    }).catch(() => {
+      ElMessage({
+        type: 'info',
+        message: 'Operation canceled',
+      })
+    })
+  }
 }
 
 const cancelSupplierForm = () => {
@@ -57,8 +106,8 @@ const cancelSupplierForm = () => {
     <el-row :gutter="20" class="pb-2">
       <el-col :span="24" class="text-right">
         <el-button
-          v-if="hasPermission('UPDATE_ROLES')" type="primary" size="small" plain
-          @click="openSupplierForm('create')"
+          v-if="hasPermission('CREATE_SUPPLIERS')" type="primary" size="small" plain
+          @click="openSupplierForm('create', null)"
         >
           <Icon icon="mdi-light:plus-circle" width="14" height="14" /> Add New Supplier
         </el-button>
@@ -92,20 +141,24 @@ const cancelSupplierForm = () => {
           <el-table-column label="Actions">
             <template #default="scope">
               <el-button
+                v-if="hasPermission('UPDATE_SUPPLIERS')"
                 type="primary"
                 size="small"
                 plain
                 round
                 title="Update Supplier Details"
+                @click="openSupplierForm('update', scope?.row)"
               >
                 <Icon icon="mdi-light:pencil" />
               </el-button>
               <el-button
+                v-if="hasPermission('DELETE_SUPPLIERS')"
                 :type="scope.row.active ? 'danger' : 'primary'"
                 size="small"
                 plain
                 round
                 :title="scope.row.active ? 'Deactivate Supplier' : 'Activate Supplier'"
+                @click="activateDeactivateSupplier(scope?.row)"
               >
                 <Icon :icon="`mdi-light:${scope.row.active ? 'delete' : 'check-circle'}`" />
               </el-button>
@@ -134,7 +187,16 @@ const cancelSupplierForm = () => {
           <el-divider />
           <el-form-item>
             <el-button
-              type="primary" size="small" plain @click="submitSupplierDetails">Submit Details
+              type="primary" size="small" plain @click="submitSupplierDetails"
+              v-if="formTitle.includes('CREATE')"
+            >
+              Submit Details
+            </el-button>
+            <el-button
+              type="primary" size="small" plain @click="editSupplierDetails"
+              v-if="formTitle.includes('UPDATE')"
+            >
+              Update Details
             </el-button>
             <el-button size="small" @click="cancelSupplierForm">Cancel</el-button>
           </el-form-item>

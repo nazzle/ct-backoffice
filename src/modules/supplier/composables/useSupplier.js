@@ -1,6 +1,8 @@
 import { onMounted, ref } from 'vue'
 import { ElMessage } from 'element-plus'
-import { createSupplier, getSuppliers } from '@/modules/supplier/api/supplier.js'
+import {
+  createSupplier, getSuppliers, updateSupplier, updateSupplierStatus
+} from '@/modules/supplier/api/supplier.js'
 
 export function useSupplier() {
   const suppliers = ref([])
@@ -41,7 +43,50 @@ export function useSupplier() {
       }
     } catch (error) {
       success.value = false
-      error.value = error.response?.data?.errors?.code[0] || 'Failed to save suppliers details'
+      error.value = error.response?.data?.errors?.code[0] || 'Failed to save supplier details'
+      ElMessage.error(error.value)
+    } finally {
+      loading.value = false
+    }
+  }
+
+  const updateSupplierDetails = async (data) => {
+    loading.value = true
+    try {
+      const response = await updateSupplier(data.value, data.value?.id)
+      const responseObj = response.data
+      if (responseObj.status === true) {
+        success.value = true
+        ElMessage.success(responseObj.message)
+      } else {
+        success.value = false
+        ElMessage.error("error")
+      }
+    } catch (error) {
+      success.value = false
+      error.value = error.response?.data?.errors?.code[0] || 'Failed to update supplier details'
+      ElMessage.error(error.value)
+    } finally {
+      loading.value = false
+    }
+  }
+
+  const changeSupplierStatus = async (data) => {
+    loading.value = true
+    try {
+      const response = await updateSupplierStatus(data, data?.id)
+      const responseObj = response.data
+      if (responseObj.status === true) {
+        success.value = true
+        ElMessage.success(responseObj.message)
+      } else {
+        success.value = false
+        ElMessage.error("error")
+      }
+    } catch (error) {
+      console.log(error)
+      success.value = false
+      error.value = error.response?.data?.errors?.code[0] || 'Failed to update supplier status'
       ElMessage.error(error.value)
     } finally {
       loading.value = false
@@ -58,6 +103,8 @@ export function useSupplier() {
     allSuppliers,
     fetchSuppliers,
     saveSupplierDetails,
+    updateSupplierDetails,
+    changeSupplierStatus
   }
 
 }
