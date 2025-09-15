@@ -19,7 +19,7 @@ export function useSupplier() {
       if (responseObj.status === true) {
         suppliers.value = responseObj?.suppliers?.data
       } else {
-        ElMessage.error("error")
+        ElMessage.error(responseObj.message)
       }
     } catch (error) {
       error.value = error.response?.data?.message || 'Failed to fetch suppliers'
@@ -39,7 +39,7 @@ export function useSupplier() {
         ElMessage.success(responseObj.message)
       } else {
         success.value = false
-        ElMessage.error("error")
+        ElMessage.error(responseObj.message)
       }
     } catch (error) {
       success.value = false
@@ -60,7 +60,7 @@ export function useSupplier() {
         ElMessage.success(responseObj.message)
       } else {
         success.value = false
-        ElMessage.error("error")
+        ElMessage.error(responseObj.message)
       }
     } catch (error) {
       success.value = false
@@ -81,7 +81,7 @@ export function useSupplier() {
         ElMessage.success(responseObj.message)
       } else {
         success.value = false
-        ElMessage.error("error")
+        ElMessage.error(responseObj.message)
       }
     } catch (error) {
       console.log(error)
