@@ -3,6 +3,7 @@ import { ElMessage } from 'element-plus'
 import {
   getPaginatedCategories, createCategory, updateCategory, updateCategoryStatus
 } from '@/modules/inventory/api/categories.js'
+import { usePagination } from '@/composables/usePagination.js'
 
 export function useCategory () {
 
@@ -11,14 +12,18 @@ export function useCategory () {
   const loading = ref(false)
   const error = ref(null)
   const success = ref(false)
+  const pagination = usePagination().pagination
 
   const fetchCategories = async () => {
     loading.value = true
     try {
-      const response = await getPaginatedCategories()
+      const response = await getPaginatedCategories(pagination.value.page, pagination.value.pageSize)
       const responseObj = response.data
       if (responseObj.status === true) {
         categories.value = responseObj?.categories?.data
+        pagination.value.page = responseObj.categories.current_page;
+        pagination.value.pageSize = responseObj.categories.per_page;
+        pagination.value.totalItems = responseObj.categories.total;
       } else {
         ElMessage.error(responseObj.message)
       }
@@ -66,6 +71,7 @@ export function useCategory () {
     saveCategoryDetails,
     updateCategoryStatus,
     updateCategoryDetails,
+    pagination,
   }
 
 }
