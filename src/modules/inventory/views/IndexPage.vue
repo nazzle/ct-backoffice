@@ -2,6 +2,8 @@
 import PageTitle from '@/components/globals/PageTitle.vue'
 import { hasPermission } from '@/utils/permissions.js'
 import CategoriesManagement from '@/modules/inventory/views/partials/CategoriesManagement.vue'
+import LocationsManagement from '@/modules/inventory/views/partials/LocationsManagement.vue'
+import ItemManagement from '@/modules/inventory/views/partials/ItemManagement.vue'
 
 // #------------- Props / Emits ---------------------#
 
@@ -24,24 +26,26 @@ const pageTitle = 'Items & Inventories Management'
         <el-tabs type="border-card">
 
           <!--   CATEGORIES LIST TAB   -->
-          <el-tab-pane v-if="hasPermission('VIEW_EMPLOYEES_LIST')" label="Categories Management">
+          <el-tab-pane v-if="hasPermission('VIEW_CATEGORIES')" label="Categories Management">
             <CategoriesManagement />
           </el-tab-pane>
 
           <!--   LOCATION LIST TAB   -->
-          <el-tab-pane v-if="hasPermission('VIEW_EMPLOYEES_LIST')" label="Locations Management">
+          <el-tab-pane v-if="hasPermission('VIEW_LOCATIONS')" label="Locations Management">
+            <LocationsManagement />
           </el-tab-pane>
 
           <!--   ITEMS LIST TAB   -->
-          <el-tab-pane v-if="hasPermission('VIEW_EMPLOYEES_LIST')" label="Items Management">
+          <el-tab-pane v-if="hasPermission('VIEW_ITEMS')" label="Items Management">
+            <ItemManagement />
           </el-tab-pane>
 
           <!--   INVENTORIES LIST TAB   -->
-          <el-tab-pane v-if="hasPermission('VIEW_EMPLOYEES_LIST')" label="Inventory Management">
+          <el-tab-pane v-if="hasPermission('VIEW_INVENTORY')" label="Inventory Management">
           </el-tab-pane>
 
           <!--   INVENTORY MOVEMENTS LIST TAB   -->
-          <el-tab-pane v-if="hasPermission('VIEW_EMPLOYEES_LIST')" label="Inventory-Movements Management">
+          <el-tab-pane v-if="hasPermission('VIEW_MOVEMENTS')" label="Inventory-Movements Management">
           </el-tab-pane>
 
         </el-tabs>

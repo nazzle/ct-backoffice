@@ -30,7 +30,7 @@ const {
 } = useUser()
 const { getNonPaginatedListOfEmployees, allEmployees } = useEmployee()
 
-// #------------- Watchers -------------#
+// #------------- Watchers --------------------------#
 onMounted(() => {
   getNonPaginatedListOfRoles()
   getNonPaginatedListOfEmployees()

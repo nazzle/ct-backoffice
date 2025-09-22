@@ -1,43 +1,43 @@
 import { onMounted, ref } from 'vue'
 import { ElMessage } from 'element-plus'
 import {
-  getPaginatedCategories, createCategory, updateCategory, updateCategoryStatus
-} from '@/modules/inventory/api/categories.js'
+  getPaginatedLocations, createLocation, updateLocation, updateLocationStatus
+} from '@/modules/inventory/api/Locations.js'
 import { usePagination } from '@/composables/usePagination.js'
 
-export function useCategory () {
+export function useLocation () {
 
-  const categories = ref([])
+  const locations = ref([])
   const loading = ref(false)
   const error = ref(null)
   const success = ref(false)
   const pagination = usePagination().pagination
 
-  const fetchCategories = async () => {
+  const fetchLocations = async () => {
     loading.value = true
     try {
-      const response = await getPaginatedCategories(pagination.value.page, pagination.value.pageSize)
+      const response = await getPaginatedLocations(pagination.value.page, pagination.value.pageSize)
       const responseObj = response.data
       if (responseObj.status === true) {
-        categories.value = responseObj?.categories?.data
-        pagination.value.page = responseObj.categories.current_page;
-        pagination.value.pageSize = responseObj.categories.per_page;
-        pagination.value.totalItems = responseObj.categories.total;
+        locations.value = responseObj?.locations?.data
+        pagination.value.page = responseObj.locations.current_page;
+        pagination.value.pageSize = responseObj.locations.per_page;
+        pagination.value.totalItems = responseObj.locations.total;
       } else {
         ElMessage.error(responseObj.message)
       }
     } catch (error) {
-      error.value = error.response?.data?.message || 'Failed to fetch categories'
+      error.value = error.response?.data?.message || 'Failed to fetch locations'
       ElMessage.error(error.value)
     } finally {
       loading.value = false
     }
   }
 
-  const saveCategoryDetails = async (data) => {
+  const saveLocationDetails = async (data) => {
     loading.value = true
     try {
-      const response = await createCategory(data)
+      const response = await createLocation(data)
       const responseObj = response.data
       if (responseObj.status === true) {
         success.value = true
@@ -48,17 +48,17 @@ export function useCategory () {
       }
     } catch (error) {
       success.value = false
-      error.value = error.response?.data?.errors?.code[0] || 'Failed to save category details'
+      error.value = error.response?.data?.errors?.code[0] || 'Failed to save location details'
       ElMessage.error(error.value)
     } finally {
       loading.value = false
     }
   }
 
-  const updateCategoryDetails = async (data) => {
+  const updateLocationDetails = async (data) => {
     loading.value = true
     try {
-      const response = await updateCategory(data, data?.id)
+      const response = await updateLocation(data, data?.id)
       const responseObj = response.data
       if (responseObj.status === true) {
         success.value = true
@@ -73,10 +73,10 @@ export function useCategory () {
     }
   }
 
-  const activateDeactivateCategory = async (categoryId) => {
+  const activateDeactivateLocation = async (locationId) => {
     loading.value = true
     try {
-      const response = await updateCategoryStatus(categoryId)
+      const response = await updateLocationStatus(locationId)
       const responseObj = response.data
       if (responseObj.status === true) {
         success.value = true
@@ -90,17 +90,17 @@ export function useCategory () {
     }
   }
 
-  onMounted(() => fetchCategories())
+  onMounted(() => fetchLocations())
 
   return {
-    categories,
+    locations,
     loading,
     error,
     success,
-    fetchCategories,
-    saveCategoryDetails,
-    activateDeactivateCategory,
-    updateCategoryDetails,
+    fetchLocations,
+    saveLocationDetails,
+    activateDeactivateLocation,
+    updateLocationDetails,
     pagination,
   }
 

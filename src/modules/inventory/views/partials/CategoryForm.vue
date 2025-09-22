@@ -1,6 +1,6 @@
 <script setup>
 import PageTitle from '@/components/globals/PageTitle.vue'
-import { computed, ref } from 'vue'
+import { computed, ref, watch } from 'vue'
 import { useCategory } from '@/modules/inventory/composables/useCategory.js'
 
 // #------------- Props / Emits ---------------------#
@@ -17,29 +17,42 @@ const form = ref({
   code: '',
   description: '',
 })
-const { saveCategoryDetails, success } = useCategory()
+const { saveCategoryDetails, success, updateCategoryDetails } = useCategory()
 
 // #------------- Computed Properties ---------------#
 const pageTitle = computed(() => {
   return  props.crudOption === 'create' ? 'CREATE NEW CATEGORY' : 'UPDATE CATEGORY DETAILS'
 })
 
-const categoryFormObj = computed(() => {
-  if (props.categoryObject) {
-    return props.categoryObject
-  } else {
-    return {
-      name: '',
-      code: ''
+// #------------- Watchers --------------------------#
+watch(
+  () => props.categoryObject,
+  (newValue) => {
+    if (newValue) {
+      form.value = {
+        ...newValue
+      }
     }
-  }
-})
+  },
+  { immediate: true, deep: true }
+)
 
-// #------------- methods --------------------------#
+// #------------- methods ---------------------------#
 const onSubmit = () => {
   categoryForm.value.validate(async (valid) => {
     if (valid) {
       await saveCategoryDetails(form.value)
+      if (success.value) {
+        emits('completeCategoryAction')
+      }
+    }
+  })
+}
+
+const onUpdate = () => {
+  categoryForm.value.validate(async (valid) => {
+    if (valid) {
+      await updateCategoryDetails(form.value)
       if (success.value) {
         emits('completeCategoryAction')
       }
@@ -79,6 +92,12 @@ const cancelForm = () => {
               @click="onSubmit"
             >
               Create New Category
+            </el-button>
+            <el-button
+              v-if="crudOption === 'update' " type="primary" plain size="small"
+              @click="onUpdate"
+            >
+              Update Category Details
             </el-button>
             <el-button plain size="small" @click="cancelForm">Cancel</el-button>
           </el-form-item>

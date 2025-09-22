@@ -7,4 +7,4 @@ export const getPaginatedCategories = (page, perPage) =>
   })
 export const createCategory  = (categoryDto) => api.post(`/categories` , categoryDto)
 export const updateCategory = (categoryDto, categoryId) => api.put(`/categories/${categoryId}`, categoryDto)
-export const updateCategoryStatus = (categoryDto, categoryId) => api.patch(`/categories/${categoryId}/delete`)
+export const updateCategoryStatus = (categoryId) => api.patch(`/categories/${categoryId}/delete`)

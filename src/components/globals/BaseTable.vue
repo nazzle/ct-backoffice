@@ -38,7 +38,7 @@ function indexNumber(scope) {
       :header-cell-style="{ backgroundColor: '#f5f7fa', fontWeight: 'bold' }"
     >
       <template v-for="col in columns" :key="col.key">
-        <el-table-column v-if="col.type === 'index' " :label="col.label">
+        <el-table-column v-if="col.type === 'index' " :label="col.label" width="90">
           <template #default="scope">
             {{indexNumber(scope)}}
           </template>
