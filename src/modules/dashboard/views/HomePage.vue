@@ -10,6 +10,7 @@ import expensesSvg from '@/assets/images/expenses.svg'
 import giftCardsSvg from '@/assets/images/giftcard.svg'
 import notificationsSvg from '@/assets/images/notifications.svg'
 import restockingSvg from '@/assets/images/restocking.svg'
+import referenceDataSvg from '@/assets/images/referenceData.svg'
 import { hasPermission } from '@/utils/permissions.js'
 
 const modules = [
@@ -29,6 +30,12 @@ const modules = [
     name: 'Suppliers',
     logo: suppliersSvg,
     path: '/suppliers/index',
+    permissions: 'VIEW_SUPPLIERS_MODULE',
+  },
+  {
+    name: 'Reference Data',
+    logo: referenceDataSvg,
+    path: '/reference-data/index',
     permissions: 'VIEW_SUPPLIERS_MODULE',
   },
   {
