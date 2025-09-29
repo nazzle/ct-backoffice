@@ -20,6 +20,11 @@ const dialogTitle = ref('')
 const modalType = ref('')
 const formData = ref(null)
 
+// child refs
+const itemTypesRef = ref(null)
+const itemGendersRef = ref(null)
+const countriesRef = ref(null)
+
 // #------------- Watchers ---------------------------#
 
 // #------------- Methods ---------------------------#
@@ -49,6 +54,21 @@ const closeModal = () => {
   modalType.value = ''
   formData.value = null
 }
+
+const onItemTypeCompleted = () => {
+  closeModal()
+  itemTypesRef.value?.reload && itemTypesRef.value.reload()
+}
+
+const onItemGenderCompleted = () => {
+  closeModal()
+  itemGendersRef.value?.reload && itemGendersRef.value.reload()
+}
+
+const onCountryCompleted = () => {
+  closeModal()
+  countriesRef.value?.reload && countriesRef.value.reload()
+}
 </script>
 
 <template>
@@ -59,17 +79,20 @@ const closeModal = () => {
         <el-tabs type="border-card">
           <!--   ITEM TYPES TAB   -->
           <el-tab-pane label="Item Types">
-            <ItemsTypesManagement @openItemTypeModal="openItemTypeModal" />
+            <ItemsTypesManagement ref="itemTypesRef" @openItemTypeModal="openItemTypeModal" />
           </el-tab-pane>
 
           <!--   ITEM GENDERS TAB   -->
           <el-tab-pane label="Item Genders">
-            <ItemGendersManagements @openItemGenderModal="openItemGenderModal" />
+            <ItemGendersManagements
+              ref="itemGendersRef"
+              @openItemGenderModal="openItemGenderModal"
+            />
           </el-tab-pane>
 
           <!--   COUNTRIES TAB   -->
           <el-tab-pane label="Countries">
-            <CountriesManagement @openCountryModal="openCountryModal" />
+            <CountriesManagement ref="countriesRef" @openCountryModal="openCountryModal" />
           </el-tab-pane>
         </el-tabs>
       </el-col>
@@ -81,17 +104,17 @@ const closeModal = () => {
             <ItemTypeForm
               v-if="modalType === 'itemType'"
               :itemTypeDetails="formData"
-              @completeItemTypeCreate="closeModal"
+              @completeItemTypeCreate="onItemTypeCompleted"
             />
             <ItemGenderForm
               v-if="modalType === 'itemGender'"
               :itemGenderDetails="formData"
-              @completeItemGenderCreate="closeModal"
+              @completeItemGenderCreate="onItemGenderCompleted"
             />
             <CountryForm
               v-if="modalType === 'country'"
               :countryDetails="formData"
-              @completeCountryCreate="closeModal"
+              @completeCountryCreate="onCountryCompleted"
             />
           </div>
         </div>

@@ -68,6 +68,14 @@ const toggleStatus = (country) => {
       // User cancelled
     })
 }
+
+const reloadCountries = () => {
+  fetchCountries()
+}
+
+defineExpose({
+  reload: reloadCountries,
+})
 </script>
 
 <template>
