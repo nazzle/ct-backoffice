@@ -1,6 +1,6 @@
 <script setup>
 import PageTitle from '@/components/globals/PageTitle.vue'
-import { onMounted, ref, watch } from 'vue'
+import { ref, watch } from 'vue'
 import { useEmployee } from '@/modules/hr/composables/useEmployee.js'
 import { useUser } from '@/modules/hr/composables/useUser.js'
 import NewEmployee from '@/modules/hr/views/partials/NewEmployee.vue'
@@ -12,6 +12,7 @@ import RolesManagement from '@/modules/hr/views/partials/RolesManagement.vue'
 import PermissionsManagement from '@/modules/hr/views/partials/PermissionsManagement.vue'
 import NewRole from '@/modules/hr/views/partials/NewRole.vue'
 import { useRole } from '@/modules/hr/composables/useRole.js'
+import { hasPermission } from '@/utils/permissions.js'
 
 // #------------- Props / Emits -------------#
 
@@ -115,10 +116,10 @@ const activateDeactivateEmployee = (data) => {
       <el-col :span="24">
         <el-tabs type="border-card">
           <!--   EMPLOYEES LIST TAB   -->
-          <el-tab-pane label="Employees Management">
+          <el-tab-pane v-if="hasPermission('VIEW_EMPLOYEES_LIST')" label="Employees Management">
             <el-row :gutter="20" class="pb-2">
               <el-col :span="24" class="text-right">
-                <el-button type="primary" size="small" plain @click="openModal('employee')">
+                <el-button v-if="hasPermission('SAVE_EMPLOYEE_DETAILS')" type="primary" size="small" plain @click="openModal('employee')">
                   <Icon icon="mdi-light:plus-circle" width="14" height="14" /> Add New Employee
                 </el-button>
               </el-col>
@@ -155,6 +156,7 @@ const activateDeactivateEmployee = (data) => {
               <el-table-column label="Actions">
                 <template #default="scope">
                   <el-button
+                    v-if="hasPermission('UPDATE_EMPLOYEE_DETAILS')"
                     type="primary"
                     size="small"
                     plain
@@ -165,6 +167,7 @@ const activateDeactivateEmployee = (data) => {
                     <Icon icon="mdi-light:pencil" />
                   </el-button>
                   <el-button
+                    v-if="hasPermission('DELETE_EMPLOYEE_DETAILS')"
                     :type="scope.row.active ? 'danger' : 'primary'"
                     size="small"
                     plain
@@ -179,10 +182,10 @@ const activateDeactivateEmployee = (data) => {
             </el-table>
           </el-tab-pane>
           <!--   USERS LIST TAB   -->
-          <el-tab-pane label="Users Management">
+          <el-tab-pane v-if="hasPermission('VIEW_USERS')" label="Users Management">
             <el-row :gutter="20" class="pb-2">
               <el-col :span="24" class="text-right">
-                <el-button type="primary" size="small" plain @click="openModal('user')">
+                <el-button v-if="hasPermission('CREATE_USERS')" type="primary" size="small" plain @click="openModal('user')">
                   <Icon icon="mdi-light:plus-circle" width="14" height="14" /> Add New User
                 </el-button>
               </el-col>
@@ -190,10 +193,10 @@ const activateDeactivateEmployee = (data) => {
             <user-management />
           </el-tab-pane>
           <!--   ROLES LIST TAB   -->
-          <el-tab-pane label="Roles">
+          <el-tab-pane v-if="hasPermission('ASSIGN_ROLES')" label="Roles">
             <el-row :gutter="20" class="pb-2">
               <el-col :span="24" class="text-right">
-                <el-button type="primary" size="small" plain @click="openModal('role')">
+                <el-button v-if="hasPermission('UPDATE_ROLES')" type="primary" size="small" plain @click="openModal('role')">
                   <Icon icon="mdi-light:plus-circle" width="14" height="14" /> Add New Role
                 </el-button>
               </el-col>
@@ -201,7 +204,7 @@ const activateDeactivateEmployee = (data) => {
             <RolesManagement />
           </el-tab-pane>
           <!--   PERMISSIONS LIST TAB   -->
-          <el-tab-pane label="Permissions">
+          <el-tab-pane v-if="hasPermission('UPDATE_ROLES')" label="Permissions">
             <PermissionsManagement />
           </el-tab-pane>
         </el-tabs>
@@ -230,4 +233,6 @@ const activateDeactivateEmployee = (data) => {
   </div>
 </template>
 
-<style scoped></style>
+<style scoped>
+
+</style>

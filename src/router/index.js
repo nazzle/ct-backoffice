@@ -3,6 +3,9 @@ import { authRoutes } from '@/modules/authentication/router/index.js'
 import { dashboardRoutes } from '@/modules/dashboard/router/index.js'
 import { authGuard } from '@/router/authGuard.js'
 import { hrRoutes } from '@/modules/hr/router/index.js'
+import { inventoryRoutes } from '@/modules/inventory/router/index.js'
+import { supplierRoutes } from '@/modules/supplier/router/index.js'
+import { referenceDataRoutes } from '@/modules/reference-data/router/index.js'
 
 const router = createRouter({
   history: createWebHistory(import.meta.env.BASE_URL),
@@ -20,6 +23,9 @@ const router = createRouter({
     ...authRoutes,
     ...dashboardRoutes,
     ...hrRoutes,
+    ...inventoryRoutes,
+    ...supplierRoutes,
+    ...referenceDataRoutes,
   ],
 })
 

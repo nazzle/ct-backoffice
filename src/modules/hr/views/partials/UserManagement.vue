@@ -5,6 +5,7 @@ import { ref } from 'vue'
 import { ElMessageBox } from 'element-plus'
 import UserForm from '@/modules/hr/views/partials/UserForm.vue'
 import PageTitle from '@/components/globals/PageTitle.vue'
+import { hasPermission } from '@/utils/permissions.js'
 
 // #------------- Props / Emits -------------#
 
@@ -88,6 +89,7 @@ const closeModal = () => {
           <el-table-column label="Actions">
             <template #default="scope">
               <el-button
+                v-if="hasPermission('UPDATE_USERS')"
                 type="primary"
                 size="small"
                 plain
@@ -98,6 +100,7 @@ const closeModal = () => {
                 <Icon icon="mdi-light:pencil" />
               </el-button>
               <el-button
+                v-if="hasPermission('DELETE_USERS')"
                 :type="scope.row.active ? 'danger' : 'primary'"
                 size="small"
                 plain

@@ -1,5 +1,12 @@
 import { onMounted, ref } from 'vue'
-import { deleteUser, getAllRoles, getUsers, saveUser, updateUser } from '@/modules/hr/api/users.js'
+import {
+  deleteUser,
+  getAllRoles,
+  getLoggedInUserProfile,
+  getUsers,
+  saveUser,
+  updateUser
+} from '@/modules/hr/api/users.js'
 import { ElMessage } from 'element-plus'
 
 export function useUser() {
@@ -8,6 +15,7 @@ export function useUser() {
   const loading = ref(false)
   const error = ref(null)
   const success = ref(false)
+  const myProfile = ref(null)
 
   const fetchUsers = async () => {
     loading.value = true
@@ -100,6 +108,25 @@ export function useUser() {
     }
   }
 
+  const getUserProfile = async (data) => {
+    loading.value = true
+
+    try {
+      const response = await getLoggedInUserProfile(data)
+      const responseObj = response.data
+      if (responseObj.status === true) {
+        success.value = true
+        loading.value = false
+
+        myProfile.value = responseObj?.user
+      } else {
+        ElMessage.error(response?.data?.message)
+      }
+    } catch (error) {
+      ElMessage.error(error?.response?.data?.message)
+    }
+  }
+
   onMounted(() => fetchUsers())
 
   return {
@@ -113,6 +140,8 @@ export function useUser() {
     saveNewUser,
     changeUserStatus,
     updateUserDetails,
+    getUserProfile,
+    myProfile,
   }
 
 }

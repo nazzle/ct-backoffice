@@ -1,5 +1,6 @@
 import { onMounted, ref } from 'vue'
 import {
+  deleteRole,
   getPaginatedRoles,
   getPermissionsList,
   saveRole,
@@ -89,6 +90,24 @@ export function useRole() {
     }
   }
 
+  const activateDeactivateRole = async (roleId) => {
+    loading.value = true
+    try {
+      const response = await deleteRole(roleId)
+      const responseObj = response.data
+      if (responseObj.status === true) {
+        success.value = true
+        loading.value = false
+        ElMessage.success(responseObj.message)
+      } else {
+        loading.value = false
+        ElMessage.error(responseObj.message)
+      }
+    } catch (error) {
+      error.value = JSON.stringify(error?.response?.data?.errors)
+    }
+  }
+
   onMounted(() => fetchRoles())
 
   return {
@@ -100,6 +119,7 @@ export function useRole() {
     permissionsList,
     createRole,
     updateRoleDetails,
+    activateDeactivateRole,
   }
 
 }

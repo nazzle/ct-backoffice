@@ -1,6 +1,7 @@
 import { onMounted, ref } from 'vue'
 import {
-  createEmployee, getAllEmployees,
+  createEmployee,
+  getAllEmployees,
   getEmployees,
   updateEmployee,
   updateEmployeeStatus
@@ -21,6 +22,8 @@ export function useEmployee() {
       const responseObj = response.data
       if (responseObj.status === true) {
         employees.value = responseObj?.employeesResponse?.data
+      } else {
+        ElMessage.error(responseObj.message)
       }
     } catch (error) {
       error.value = error.response?.data?.message || 'Failed to fetch employees'
