@@ -68,6 +68,14 @@ const toggleStatus = (itemGender) => {
       // User cancelled
     })
 }
+
+const reloadItemGenders = () => {
+  fetchItemGenders()
+}
+
+defineExpose({
+  reload: reloadItemGenders,
+})
 </script>
 
 <template>

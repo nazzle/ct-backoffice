@@ -24,10 +24,10 @@ export function useItemType() {
       const response = await getItemTypes(pagination.value.page, pagination.value.pageSize)
       const responseObj = response.data
       if (responseObj.status === true) {
-        itemTypes.value = responseObj?.itemTypes?.data || responseObj?.data || []
-        pagination.value.page = responseObj.itemTypes?.current_page || responseObj.current_page || 1
-        pagination.value.pageSize = responseObj.itemTypes?.per_page || responseObj.per_page || 10
-        pagination.value.totalItems = responseObj.itemTypes?.total || responseObj.total || 0
+        itemTypes.value = responseObj?.item_types?.data || responseObj?.data || []
+        pagination.value.page = responseObj.item_types?.current_page || responseObj.current_page || 1
+        pagination.value.pageSize = responseObj.item_types?.per_page || responseObj.per_page || 10
+        pagination.value.totalItems = responseObj.item_types?.total || responseObj.total || 0
       } else {
         ElMessage.error(responseObj.message || 'Failed to fetch item types')
       }

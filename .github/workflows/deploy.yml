@@ -1,0 +1,42 @@
+name: Build and Deploy ChekiiToto POS app to cPanel
+
+on:
+  push:
+    branches:
+      - main   # adjust if using 'master'
+
+jobs:
+  build-and-deploy:
+    runs-on: ubuntu-latest
+
+    steps:
+      # Checkout repo
+      - name: Checkout code
+        uses: actions/checkout@v3
+
+      # Setup Node.js
+      - name: Setup Node.js
+        uses: actions/setup-node@v3
+        with:
+          node-version: '18'
+
+      # Install dependencies and build Vue app
+      - name: Install and Build
+        run: |
+          npm ci
+          npm run build
+
+      # Deploy the dist/ folder via FTP
+      - name: Deploy via FTP
+        uses: SamKirkland/FTP-Deploy-Action@v4.3.4
+        with:
+          server: ${{ secrets.CPANEL_FTP_SERVER }}
+          username: ${{ secrets.CPANEL_FTP_USER }}
+          password: ${{ secrets.CPANEL_FTP_PASS }}
+          server-dir: pos.chekiitoto.tz   # change to where you want app deployed
+          local-dir: dist/
+
+      # Clean up dist/ after deploy
+      - name: Remove build folder
+        run: rm -rf dist
+

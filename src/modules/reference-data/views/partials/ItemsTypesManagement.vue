@@ -3,11 +3,18 @@ import { ref, watch } from 'vue'
 import { useItemType } from '@/modules/reference-data/composables/useItemType.js'
 import { ElMessageBox } from 'element-plus'
 import { dateFormatter } from '@/components/globals/constants.js'
+import BaseTable from '@/components/globals/BaseTable.vue'
 
 // #------------- Props / Emits ---------------------#
 const emit = defineEmits(['openItemTypeModal'])
 
 // #------------- Reactive & Refs State -------------#
+const columns = [
+  { key: 'id', label: 'S/N', type: 'index' },
+  { key: 'code', label: 'Code' },
+  { key: 'name', label: 'Name' },
+  { key: 'description', label: 'Description' },
+]
 const {
   itemTypes,
   loading,
@@ -68,6 +75,24 @@ const toggleStatus = (itemType) => {
       // User cancelled
     })
 }
+const getNextData = (newPage) => {
+  pagination.value.page = newPage
+  fetchItemTypes()
+}
+
+function changePageSize(newSize) {
+  pagination.value.pageSize = newSize
+  pagination.value.page = 1
+  fetchItemTypes()
+}
+
+const reloadItemsTypes = () => {
+  fetchItemTypes()
+}
+
+defineExpose({
+  reload: reloadItemsTypes,
+})
 </script>
 
 <template>
@@ -79,11 +104,15 @@ const toggleStatus = (itemType) => {
         </el-button>
       </el-col>
     </el-row>
-    {{itemTypes}}
-    <el-table :data="itemTypes" style="width: 100%" v-loading="loading">
-      <el-table-column label="S/N" type="index" width="80" />
-      <el-table-column prop="name" label="Item Type Name" />
-      <el-table-column prop="description" label="Description" />
+    <BaseTable
+      :pagination="pagination"
+      :rows="itemTypes"
+      :columns="columns"
+      @update:page="getNextData"
+      @update:pageSize="changePageSize"
+      style="width: 100%"
+      v-loading="loading"
+    >
       <el-table-column prop="active" label="Status" width="100">
         <template #default="scope">
           <el-tag :type="scope.row.active ? 'primary' : 'danger'">
@@ -130,7 +159,7 @@ const toggleStatus = (itemType) => {
           </el-button>
         </template>
       </el-table-column>
-    </el-table>
+    </BaseTable>
   </div>
 </template>
 
