@@ -10,5 +10,14 @@ export default mergeConfig(
       exclude: [...configDefaults.exclude, 'e2e/**'],
       root: fileURLToPath(new URL('./', import.meta.url)),
     },
+    resolve: {
+      alias: {
+        crypto: "crypto-browserify",
+        stream: "stream-browserify"
+      }
+    },
+    define: {
+      "process.env": {}
+    }
   }),
 )
