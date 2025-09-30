@@ -19,6 +19,7 @@ const itemGenderId = ref(null)
 
 const form = ref({
   name: '',
+  code: '',
   description: '',
   active: true,
 })
@@ -98,8 +99,16 @@ const resetForm = () => {
     >
       <el-row :gutter="20">
         <el-col :span="24">
-          <el-form-item label="Item Gender Name" prop="name">
+          <el-form-item label="Name" prop="name">
             <el-input v-model="form.name" placeholder="Enter item gender name" clearable />
+          </el-form-item>
+        </el-col>
+      </el-row>
+
+      <el-row :gutter="20">
+        <el-col :span="24">
+          <el-form-item label="Code" prop="code">
+            <el-input v-model="form.code" placeholder="Enter code" clearable />
           </el-form-item>
         </el-col>
       </el-row>

@@ -3,11 +3,20 @@ import { ref, watch } from 'vue'
 import { useItemGender } from '@/modules/reference-data/composables/useItemGender.js'
 import { ElMessageBox } from 'element-plus'
 import { dateFormatter } from '@/components/globals/constants.js'
+import BaseTable from '@/components/globals/BaseTable.vue'
 
 // #------------- Props / Emits ---------------------#
 const emit = defineEmits(['openItemGenderModal'])
 
 // #------------- Reactive & Refs State -------------#
+const columns = [
+  { key: 'id', label: 'S/N', type: 'index' },
+  { key: 'active', label: 'Status' },
+  { key: 'code', label: 'Code' },
+  { key: 'name', label: 'Name' },
+  { key: 'description', label: 'Description' },
+  { key: 'created_at', label: 'Created At' },
+]
 const {
   itemGenders,
   loading,
@@ -69,6 +78,17 @@ const toggleStatus = (itemGender) => {
     })
 }
 
+const getNextData = (newPage) => {
+  pagination.value.page = newPage
+  fetchItemGenders()
+}
+
+function changePageSize(newSize) {
+  pagination.value.pageSize = newSize
+  pagination.value.page = 1
+  fetchItemGenders()
+}
+
 const reloadItemGenders = () => {
   fetchItemGenders()
 }
@@ -88,22 +108,15 @@ defineExpose({
       </el-col>
     </el-row>
 
-    <el-table :data="itemGenders" style="width: 100%" v-loading="loading">
-      <el-table-column label="S/N" type="index" width="80" />
-      <el-table-column prop="name" label="Item Gender Name" />
-      <el-table-column prop="description" label="Description" />
-      <el-table-column prop="active" label="Status" width="100">
-        <template #default="scope">
-          <el-tag :type="scope.row.active ? 'primary' : 'danger'">
-            {{ scope.row.active ? 'Active' : 'Inactive' }}
-          </el-tag>
-        </template>
-      </el-table-column>
-      <el-table-column prop="created_at" label="Date Created" width="150">
-        <template #default="scope">
-          {{ dateFormatter(scope.row?.created_at) }}
-        </template>
-      </el-table-column>
+    <BaseTable
+      :pagination="pagination"
+      :rows="itemGenders"
+      :columns="columns"
+      @update:page="getNextData"
+      @update:pageSize="changePageSize"
+      style="width: 100%"
+      v-loading="loading"
+    >
       <el-table-column label="Actions" width="200">
         <template #default="scope">
           <el-button
@@ -111,7 +124,7 @@ defineExpose({
             size="small"
             plain
             round
-            title="Edit Item Gender"
+            title="Edit Item Type"
             @click="editItemGender(scope.row)"
           >
             <Icon icon="mdi-light:pencil" />
@@ -131,14 +144,14 @@ defineExpose({
             size="small"
             plain
             round
-            title="Delete Item Gender"
+            title="Delete Item Type"
             @click="deleteItemGender(scope.row)"
           >
             <Icon icon="mdi-light:delete" />
           </el-button>
         </template>
       </el-table-column>
-    </el-table>
+    </BaseTable>
   </div>
 </template>
 

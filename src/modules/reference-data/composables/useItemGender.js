@@ -24,11 +24,11 @@ export function useItemGender() {
       const response = await getItemGenders(pagination.value.page, pagination.value.pageSize)
       const responseObj = response.data
       if (responseObj.status === true) {
-        itemGenders.value = responseObj?.itemGenders?.data || responseObj?.data || []
+        itemGenders.value = responseObj?.item_genders?.data || responseObj?.data || []
         pagination.value.page =
-          responseObj.itemGenders?.current_page || responseObj.current_page || 1
-        pagination.value.pageSize = responseObj.itemGenders?.per_page || responseObj.per_page || 10
-        pagination.value.totalItems = responseObj.itemGenders?.total || responseObj.total || 0
+          responseObj.item_genders?.current_page || responseObj.current_page || 1
+        pagination.value.pageSize = responseObj.item_genders?.per_page || responseObj.per_page || 10
+        pagination.value.totalItems = responseObj.item_genders?.total || responseObj.total || 0
       } else {
         ElMessage.error(responseObj.message || 'Failed to fetch item genders')
       }

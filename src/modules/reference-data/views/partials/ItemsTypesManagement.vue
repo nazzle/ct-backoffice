@@ -11,9 +11,11 @@ const emit = defineEmits(['openItemTypeModal'])
 // #------------- Reactive & Refs State -------------#
 const columns = [
   { key: 'id', label: 'S/N', type: 'index' },
+  { key: 'active', label: 'Status' },
   { key: 'code', label: 'Code' },
   { key: 'name', label: 'Name' },
   { key: 'description', label: 'Description' },
+  { key: 'created_at', label: 'Created At' },
 ]
 const {
   itemTypes,
@@ -113,18 +115,6 @@ defineExpose({
       style="width: 100%"
       v-loading="loading"
     >
-      <el-table-column prop="active" label="Status" width="100">
-        <template #default="scope">
-          <el-tag :type="scope.row.active ? 'primary' : 'danger'">
-            {{ scope.row.active ? 'Active' : 'Inactive' }}
-          </el-tag>
-        </template>
-      </el-table-column>
-      <el-table-column prop="created_at" label="Date Created" width="150">
-        <template #default="scope">
-          {{ dateFormatter(scope.row?.created_at) }}
-        </template>
-      </el-table-column>
       <el-table-column label="Actions" width="200">
         <template #default="scope">
           <el-button

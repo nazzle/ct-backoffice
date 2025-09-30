@@ -1,4 +1,5 @@
 <script setup>
+import { dateFormatter } from '@/components/globals/constants.js'
 
 const props = defineProps({
   columns: { type: Array, required: true }, // [{ key, label, width?, align? }]
@@ -41,6 +42,18 @@ function indexNumber(scope) {
         <el-table-column v-if="col.type === 'index' " :label="col.label" width="90">
           <template #default="scope">
             {{indexNumber(scope)}}
+          </template>
+        </el-table-column>
+        <el-table-column v-else-if="col.key === 'active' " label="Status">
+          <template #default="scope">
+            <el-tag :type="scope.row.active ? 'primary' : 'danger'">
+              {{ scope.row[col.key] ? 'Active' : 'Inactive' }}
+            </el-tag>
+          </template>
+        </el-table-column>
+        <el-table-column v-else-if=" col.key === 'created_at' " label="Date Created">
+          <template #default="scope">
+            {{ dateFormatter(scope.row[col.key]) }}
           </template>
         </el-table-column>
         <el-table-column
