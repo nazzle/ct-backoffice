@@ -12,8 +12,8 @@ export const updateItemType = (itemTypeDto, itemTypeId) =>
   api.put(`/item-types/${itemTypeId}`, itemTypeDto)
 
 export const updateItemTypeStatus = (itemTypeId) =>
-  api.patch(`/item-types/${itemTypeId}/status`)
+  api.patch(`/item-types/${itemTypeId}/delete`)
 
-export const deleteItemType = (itemTypeId) => api.delete(`/item-types/${itemTypeId}`)
+export const deleteItemType = (itemTypeId) => api.delete(`/item-types/${itemTypeId}/delete`)
 
 export const getAllItemTypes = () => api.get(`/item-types/all`)

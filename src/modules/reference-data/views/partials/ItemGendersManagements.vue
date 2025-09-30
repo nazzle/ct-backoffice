@@ -4,6 +4,7 @@ import { useItemGender } from '@/modules/reference-data/composables/useItemGende
 import { ElMessageBox } from 'element-plus'
 import { dateFormatter } from '@/components/globals/constants.js'
 import BaseTable from '@/components/globals/BaseTable.vue'
+import { hasPermission } from '@/utils/permissions.js'
 
 // #------------- Props / Emits ---------------------#
 const emit = defineEmits(['openItemGenderModal'])
@@ -102,7 +103,7 @@ defineExpose({
   <div class="item-genders-management">
     <el-row :gutter="20" class="pb-2">
       <el-col :span="24" class="text-right">
-        <el-button type="primary" size="small" plain @click="addItemGender">
+        <el-button type="primary" size="small" plain @click="addItemGender" v-if="hasPermission('CREATE_ITEMS')">
           <Icon icon="mdi-light:plus-circle" width="14" height="14" /> Add New Item Gender
         </el-button>
       </el-col>
@@ -120,6 +121,7 @@ defineExpose({
       <el-table-column label="Actions" width="200">
         <template #default="scope">
           <el-button
+            v-if="hasPermission('UPDATE_ITEMS')"
             type="primary"
             size="small"
             plain
@@ -130,6 +132,7 @@ defineExpose({
             <Icon icon="mdi-light:pencil" />
           </el-button>
           <el-button
+            v-if="hasPermission('DELETE_ITEMS')"
             :type="scope.row.active ? 'warning' : 'success'"
             size="small"
             plain
@@ -139,16 +142,16 @@ defineExpose({
           >
             <Icon :icon="`mdi-light:${scope.row.active ? 'eye-off' : 'eye'}`" />
           </el-button>
-          <el-button
-            type="danger"
-            size="small"
-            plain
-            round
-            title="Delete Item Type"
-            @click="deleteItemGender(scope.row)"
-          >
-            <Icon icon="mdi-light:delete" />
-          </el-button>
+<!--          <el-button-->
+<!--            type="danger"-->
+<!--            size="small"-->
+<!--            plain-->
+<!--            round-->
+<!--            title="Delete Item Type"-->
+<!--            @click="deleteItemGender(scope.row)"-->
+<!--          >-->
+<!--            <Icon icon="mdi-light:delete" />-->
+<!--          </el-button>-->
         </template>
       </el-table-column>
     </BaseTable>

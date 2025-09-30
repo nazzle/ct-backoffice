@@ -13,7 +13,7 @@ export const updateItemGender = (itemGenderDto, itemGenderId) =>
   api.put(`/item-genders/${itemGenderId}`, itemGenderDto)
 
 export const updateItemGenderStatus = (itemGenderId) =>
-  api.patch(`/item-genders/${itemGenderId}/status`)
+  api.patch(`/item-genders/${itemGenderId}/delete`)
 
 export const deleteItemGender = (itemGenderId) =>
   api.delete(`/item-genders/${itemGenderId}`)

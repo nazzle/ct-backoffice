@@ -26,18 +26,18 @@ const pageTitle = 'Items & Inventories Management'
         <el-tabs type="border-card">
 
           <!--   CATEGORIES LIST TAB   -->
-          <el-tab-pane v-if="hasPermission('VIEW_CATEGORIES')" label="Categories Management">
-            <CategoriesManagement />
+<!--          <el-tab-pane v-if="hasPermission('VIEW_CATEGORIES')" label="Categories Management">-->
+<!--            <CategoriesManagement />-->
+<!--          </el-tab-pane>-->
+
+          <!--   ITEMS LIST TAB   -->
+          <el-tab-pane v-if="hasPermission('VIEW_ITEMS')" label="Items Management">
+            <ItemManagement />
           </el-tab-pane>
 
           <!--   LOCATION LIST TAB   -->
           <el-tab-pane v-if="hasPermission('VIEW_LOCATIONS')" label="Locations Management">
             <LocationsManagement />
-          </el-tab-pane>
-
-          <!--   ITEMS LIST TAB   -->
-          <el-tab-pane v-if="hasPermission('VIEW_ITEMS')" label="Items Management">
-            <ItemManagement />
           </el-tab-pane>
 
           <!--   INVENTORIES LIST TAB   -->
