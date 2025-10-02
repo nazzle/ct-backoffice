@@ -13,8 +13,9 @@ const emit = defineEmits(['openItemModal'])
 const columns = [
   { key: 'id', label: 'S/N', type: 'index' },
   { key: 'active', label: 'Status' },
-  { key: 'code', label: 'Code' },
-  { key: 'name', label: 'Name' },
+  { key: 'barcode', label: 'Barcode' },
+  { key: 'buying_price', label: 'Buying Price' },
+  { key: 'selling_price', label: 'Selling Price' },
   { key: 'type', label: 'Type' },
   { key: 'description', label: 'Description' },
   { key: 'created_at', label: 'Created At' },

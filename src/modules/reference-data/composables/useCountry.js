@@ -136,7 +136,7 @@ export function useCountry() {
       const response = await getAllCountries()
       const responseObj = response.data
       if (responseObj.status === true) {
-        allCountries.value = responseObj?.data || []
+        allCountries.value = responseObj?.countries || []
       }
     } catch (error) {
       console.log('Error fetching all countries:', error)

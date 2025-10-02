@@ -19,16 +19,25 @@ const id = ref(null)
 
 const form = ref({
   code: '',
+  from: 0,
+  to: 0,
   description: '',
   active: true,
 })
 
 const rules = {
-  code: [{ required: true, message: 'Age group code is required', trigger: 'blur' }],
-  from: [
-    { required: true, message: 'Age group lower bound is required', trigger: 'blur' }
+  code: [
+    { required: true, message: 'Age group code is required', trigger: 'blur' },
+    { type: 'string', len: 1, message: 'Code must have exactly one character', trigger: 'blur' },
   ],
-  to: [{ required: true, message: 'Age group upper bound is required', trigger: 'blur' }],
+  from: [
+    { required: true, message: 'Age group lower bound is required', trigger: 'blur' },
+    { type: 'number', max: 99, message: 'This must be number of 2 digits', trigger: 'blur', transform: (value) => Number(value) },
+  ],
+  to: [
+    { required: true, message: 'Age group upper bound is required', trigger: 'blur' },
+    { type: 'number', max: 99, message: 'This must be number of 2 digits', trigger: 'blur', transform: (value) => Number(value) },
+  ],
 }
 
 // #------------- Watchers -------------#
@@ -42,10 +51,9 @@ watch(
     } else {
       crudOption.value = 'create'
       form.value = {
-        name: '',
         code: '',
-        from: '',
-        to: '',
+        from: 0,
+        to: 0,
         description: '',
         active: true,
       }
@@ -79,8 +87,9 @@ const submitForm = async () => {
 const resetForm = () => {
   ageGroupForm.value?.resetFields()
   form.value = {
-    name: '',
     code: '',
+    from: 0,
+    to: 0,
     description: '',
     active: true,
   }

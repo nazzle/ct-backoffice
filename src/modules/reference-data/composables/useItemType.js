@@ -136,7 +136,7 @@ export function useItemType() {
       const response = await getAllItemTypes()
       const responseObj = response.data
       if (responseObj.status === true) {
-        allItemTypes.value = responseObj?.data || []
+        allItemTypes.value = responseObj?.item_types || []
       }
     } catch (error) {
       console.log('Error fetching all item types:', error)

@@ -1,13 +1,14 @@
 import { onMounted, ref } from 'vue'
 import { ElMessage } from 'element-plus'
 import {
-  getPaginatedCategories, createCategory, updateCategory, updateCategoryStatus
+  getPaginatedCategories, createCategory, updateCategory, updateCategoryStatus, getAllCategories
 } from '@/modules/inventory/api/categories.js'
 import { usePagination } from '@/composables/usePagination.js'
 
 export function useCategory () {
 
   const categories = ref([])
+  const allCategories = ref([])
   const loading = ref(false)
   const error = ref(null)
   const success = ref(false)
@@ -28,6 +29,24 @@ export function useCategory () {
       }
     } catch (error) {
       error.value = error.response?.data?.message || 'Failed to fetch categories'
+      ElMessage.error(error.value)
+    } finally {
+      loading.value = false
+    }
+  }
+
+  const getNonPaginatedCategories = async () => {
+    loading.value = true
+    try {
+      const response = await getAllCategories()
+      const responseObj = response.data
+      if (responseObj.status === true) {
+        allCategories.value = responseObj?.categories || []
+      } else {
+        ElMessage.error(responseObj.message)
+      }
+    } catch (error) {
+      error.value = error.response?.data?.message || 'Failed to fetch all categories'
       ElMessage.error(error.value)
     } finally {
       loading.value = false
@@ -102,6 +121,8 @@ export function useCategory () {
     activateDeactivateCategory,
     updateCategoryDetails,
     pagination,
+    allCategories,
+    getNonPaginatedCategories
   }
 
 }

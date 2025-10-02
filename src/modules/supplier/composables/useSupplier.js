@@ -1,7 +1,7 @@
 import { onMounted, ref } from 'vue'
 import { ElMessage } from 'element-plus'
 import {
-  createSupplier, getSuppliers, updateSupplier, updateSupplierStatus
+  createSupplier, getSuppliers, updateSupplier, updateSupplierStatus, getAllSuppliers
 } from '@/modules/supplier/api/supplier.js'
 
 export function useSupplier() {
@@ -23,6 +23,24 @@ export function useSupplier() {
       }
     } catch (error) {
       error.value = error.response?.data?.message || 'Failed to fetch suppliers'
+      ElMessage.error(error.value)
+    } finally {
+      loading.value = false
+    }
+  }
+
+  const getNonPaginatedSuppliersList = async () => {
+    loading.value = true
+    try {
+      const response = await getAllSuppliers()
+      const responseObj = response.data
+      if (responseObj.status === true) {
+        allSuppliers.value = responseObj?.suppliers
+      } else {
+        ElMessage.error(responseObj.message)
+      }
+    } catch (error) {
+      error.value = error.response?.data?.message || 'Failed to fetch all suppliers'
       ElMessage.error(error.value)
     } finally {
       loading.value = false
@@ -104,7 +122,8 @@ export function useSupplier() {
     fetchSuppliers,
     saveSupplierDetails,
     updateSupplierDetails,
-    changeSupplierStatus
+    changeSupplierStatus,
+    getNonPaginatedSuppliersList
   }
 
 }

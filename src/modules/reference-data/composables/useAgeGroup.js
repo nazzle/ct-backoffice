@@ -132,7 +132,7 @@ export function useAgeGroup() {
       const response = await getAllAgeGroups()
       const responseObj = response.data
       if (responseObj.status === true) {
-        allAgeGroups.value = responseObj?.data || []
+        allAgeGroups.value = responseObj?.age_groups || []
       }
     } catch (err) {
       console.log('Error fetching all age groups:', err)
