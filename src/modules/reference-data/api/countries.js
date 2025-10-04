@@ -12,7 +12,7 @@ export const updateCountry = (countryDto, countryId) =>
   api.put(`/countries/${countryId}`, countryDto)
 
 export const updateCountryStatus = (countryId) =>
-  api.patch(`/countries/${countryId}/status`)
+  api.patch(`/countries/${countryId}/delete`)
 
 export const deleteCountry = (countryId) => api.delete(`/countries/${countryId}`)
 

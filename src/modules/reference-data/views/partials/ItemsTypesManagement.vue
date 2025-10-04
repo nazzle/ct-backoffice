@@ -4,6 +4,7 @@ import { useItemType } from '@/modules/reference-data/composables/useItemType.js
 import { ElMessageBox } from 'element-plus'
 import { dateFormatter } from '@/components/globals/constants.js'
 import BaseTable from '@/components/globals/BaseTable.vue'
+import { hasPermission } from '@/utils/permissions.js'
 
 // #------------- Props / Emits ---------------------#
 const emit = defineEmits(['openItemTypeModal'])
@@ -11,9 +12,11 @@ const emit = defineEmits(['openItemTypeModal'])
 // #------------- Reactive & Refs State -------------#
 const columns = [
   { key: 'id', label: 'S/N', type: 'index' },
+  { key: 'active', label: 'Status' },
   { key: 'code', label: 'Code' },
   { key: 'name', label: 'Name' },
   { key: 'description', label: 'Description' },
+  { key: 'created_at', label: 'Created At' },
 ]
 const {
   itemTypes,
@@ -99,7 +102,7 @@ defineExpose({
   <div class="item-types-management">
     <el-row :gutter="20" class="pb-2">
       <el-col :span="24" class="text-right">
-        <el-button type="primary" size="small" plain @click="addItemType">
+        <el-button type="primary" size="small" plain @click="addItemType" v-if="hasPermission('CREATE_ITEMS')">
           <Icon icon="mdi-light:plus-circle" width="14" height="14" /> Add New Item Type
         </el-button>
       </el-col>
@@ -113,21 +116,10 @@ defineExpose({
       style="width: 100%"
       v-loading="loading"
     >
-      <el-table-column prop="active" label="Status" width="100">
-        <template #default="scope">
-          <el-tag :type="scope.row.active ? 'primary' : 'danger'">
-            {{ scope.row.active ? 'Active' : 'Inactive' }}
-          </el-tag>
-        </template>
-      </el-table-column>
-      <el-table-column prop="created_at" label="Date Created" width="150">
-        <template #default="scope">
-          {{ dateFormatter(scope.row?.created_at) }}
-        </template>
-      </el-table-column>
       <el-table-column label="Actions" width="200">
         <template #default="scope">
           <el-button
+            v-if="hasPermission('UPDATE_ITEMS')"
             type="primary"
             size="small"
             plain
@@ -138,6 +130,7 @@ defineExpose({
             <Icon icon="mdi-light:pencil" />
           </el-button>
           <el-button
+            v-if="hasPermission('DELETE_ITEMS')"
             :type="scope.row.active ? 'warning' : 'success'"
             size="small"
             plain
@@ -146,16 +139,6 @@ defineExpose({
             @click="toggleStatus(scope.row)"
           >
             <Icon :icon="`mdi-light:${scope.row.active ? 'eye-off' : 'eye'}`" />
-          </el-button>
-          <el-button
-            type="danger"
-            size="small"
-            plain
-            round
-            title="Delete Item Type"
-            @click="deleteItemType(scope.row)"
-          >
-            <Icon icon="mdi-light:delete" />
           </el-button>
         </template>
       </el-table-column>

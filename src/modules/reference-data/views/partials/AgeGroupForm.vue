@@ -1,55 +1,63 @@
 <script setup>
-import { reactive, ref, watch } from 'vue'
-import { useItemGender } from '@/modules/reference-data/composables/useItemGender.js'
+import { ref, watch } from 'vue'
+import { useAgeGroup } from '@/modules/reference-data/composables/useAgeGroup.js'
 
 // #------------- Props / Emits -------------#
-const emit = defineEmits(['completeItemGenderCreate'])
+const emit = defineEmits(['completeAgeGroupCreate'])
 const props = defineProps({
-  itemGenderDetails: {
+  ageGroupDetails: {
     type: Object,
     default: () => ({}),
   },
 })
 
 // #------------- Reactive & Refs State -------------#
-const { saveItemGender, updateItemGenderDetails, success } = useItemGender()
-const itemGenderForm = ref(null)
+const { saveAgeGroup, updateAgeGroupDetails, success } = useAgeGroup()
+const ageGroupForm = ref(null)
 const crudOption = ref('create')
-const itemGenderId = ref(null)
+const id = ref(null)
 
 const form = ref({
-  name: '',
   code: '',
+  from: 0,
+  to: 0,
   description: '',
   active: true,
 })
 
 const rules = {
-  name: [
-    { required: true, message: 'Item gender name is required', trigger: 'blur' },
-    { min: 2, max: 100, message: 'Name must be between 2 and 100 characters', trigger: 'blur' },
+  code: [
+    { required: true, message: 'Age group code is required', trigger: 'blur' },
+    { type: 'string', len: 1, message: 'Code must have exactly one character', trigger: 'blur' },
   ],
-  description: [
-    { max: 500, message: 'Description must not exceed 500 characters', trigger: 'blur' },
+  from: [
+    { required: true, message: 'Age group lower bound is required', trigger: 'blur' },
+    { type: 'number', max: 99, message: 'This must be number of 2 digits', trigger: 'blur', transform: (value) => Number(value) },
+  ],
+  to: [
+    { required: true, message: 'Age group upper bound is required', trigger: 'blur' },
+    { type: 'number', max: 99, message: 'This must be number of 2 digits', trigger: 'blur', transform: (value) => Number(value) },
   ],
 }
 
 // #------------- Watchers -------------#
 watch(
-  () => props.itemGenderDetails,
+  () => props.ageGroupDetails,
   (newVal) => {
     if (newVal && Object.keys(newVal).length > 0) {
       form.value = { ...newVal }
-      itemGenderId.value = newVal.id
+      id.value = newVal.id
       crudOption.value = 'update'
     } else {
       crudOption.value = 'create'
       form.value = {
-        name: '',
+        code: '',
+        from: 0,
+        to: 0,
         description: '',
         active: true,
       }
-      itemGenderId.value = null
+      id.value = null
     }
   },
   { immediate: true },
@@ -57,41 +65,43 @@ watch(
 
 watch(success, (value) => {
   if (value) {
-    emit('completeItemGenderCreate')
+    emit('completeAgeGroupCreate')
   }
 })
 
 // #------------- Methods -------------#
 const submitForm = async () => {
-  if (!itemGenderForm.value) return
+  if (!ageGroupForm.value) return
 
-  await itemGenderForm.value.validate(async (valid) => {
+  await ageGroupForm.value.validate(async (valid) => {
     if (valid) {
       if (crudOption.value === 'create') {
-        await saveItemGender(form.value)
+        await saveAgeGroup(form.value)
       } else {
-        await updateItemGenderDetails({ ...form.value, id: itemGenderId.value })
+        await updateAgeGroupDetails({ ...form.value, id: id.value })
       }
     }
   })
 }
 
 const resetForm = () => {
-  itemGenderForm.value?.resetFields()
+  ageGroupForm.value?.resetFields()
   form.value = {
-    name: '',
+    code: '',
+    from: 0,
+    to: 0,
     description: '',
     active: true,
   }
   crudOption.value = 'create'
-  itemGenderId.value = null
+  id.value = null
 }
 </script>
 
 <template>
-  <div class="item-gender-form">
+  <div class="age-group-form">
     <el-form
-      ref="itemGenderForm"
+      ref="ageGroupForm"
       :model="form"
       :rules="rules"
       label-width="120px"
@@ -99,16 +109,21 @@ const resetForm = () => {
     >
       <el-row :gutter="20">
         <el-col :span="24">
-          <el-form-item label="Name" prop="name">
-            <el-input v-model="form.name" placeholder="Enter item gender name" clearable />
+          <el-form-item label="Code" prop="code">
+            <el-input v-model="form.code" placeholder="Enter age group code" clearable />
           </el-form-item>
         </el-col>
       </el-row>
 
       <el-row :gutter="20">
-        <el-col :span="24">
-          <el-form-item label="Code" prop="code">
-            <el-input v-model="form.code" placeholder="Enter code" clearable />
+        <el-col :span="12">
+          <el-form-item label="From" prop="from">
+            <el-input v-model="form.from" type="number" placeholder="Enter from" clearable />
+          </el-form-item>
+        </el-col>
+        <el-col :span="12">
+          <el-form-item label="To" prop="to">
+            <el-input v-model="form.to" type="number" placeholder="Enter to" clearable />
           </el-form-item>
         </el-col>
       </el-row>
@@ -140,7 +155,7 @@ const resetForm = () => {
         <el-col :span="24" class="text-right">
           <el-button @click="resetForm">Reset</el-button>
           <el-button type="primary" @click="submitForm">
-            {{ crudOption === 'create' ? 'Create' : 'Update' }} Item Gender
+            {{ crudOption === 'create' ? 'Create' : 'Update' }} Age Group
           </el-button>
         </el-col>
       </el-row>
@@ -149,7 +164,7 @@ const resetForm = () => {
 </template>
 
 <style scoped>
-.item-gender-form {
+.age-group-form {
   padding: 20px;
 }
 </style>

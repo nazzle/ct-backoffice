@@ -49,7 +49,6 @@ watch(
       form.value = {
         name: '',
         code: '',
-        currency: '',
         active: true,
       }
       countryId.value = null
@@ -110,21 +109,11 @@ const resetForm = () => {
       </el-row>
 
       <el-row :gutter="20">
-        <el-col :span="12">
+        <el-col :span="24">
           <el-form-item label="Country Code" prop="code">
             <el-input
               v-model="form.code"
               placeholder="e.g., US, NG, GB"
-              clearable
-              style="text-transform: uppercase"
-            />
-          </el-form-item>
-        </el-col>
-        <el-col :span="12">
-          <el-form-item label="Currency" prop="currency">
-            <el-input
-              v-model="form.currency"
-              placeholder="e.g., USD, NGN, GBP"
               clearable
               style="text-transform: uppercase"
             />

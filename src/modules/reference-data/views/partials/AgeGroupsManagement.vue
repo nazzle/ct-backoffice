@@ -1,117 +1,100 @@
 <script setup>
 import { ref, watch } from 'vue'
-import { hasPermission } from '@/utils/permissions.js'
-import { useItem } from '@/modules/inventory/composables/useItem.js'
-import BaseTable from '@/components/globals/BaseTable.vue'
+import { useAgeGroup } from '@/modules/reference-data/composables/useAgeGroup.js'
 import { ElMessageBox } from 'element-plus'
-import { dateFormatter } from '@/components/globals/constants.js'
+import BaseTable from '@/components/globals/BaseTable.vue'
+import { hasPermission } from '@/utils/permissions.js'
 
 // #------------- Props / Emits ---------------------#
-const emit = defineEmits(['openItemModal'])
+const emit = defineEmits(['openAgeGroupModal'])
 
 // #------------- Reactive & Refs State -------------#
 const columns = [
   { key: 'id', label: 'S/N', type: 'index' },
   { key: 'active', label: 'Status' },
-  { key: 'barcode', label: 'Barcode' },
-  { key: 'buying_price', label: 'Buying Price' },
-  { key: 'selling_price', label: 'Selling Price' },
-  { key: 'type', label: 'Type' },
+  { key: 'code', label: 'Code' },
+  { key: 'from', label: 'From' },
+  { key: 'to', label: 'To' },
   { key: 'description', label: 'Description' },
   { key: 'created_at', label: 'Created At' },
 ]
 
-const { pagination, items, loading, success, fetchItems, activateDeactivateItem, removeItem } =
-  useItem()
+const {
+  ageGroups,
+  loading,
+  success,
+  fetchAgeGroups,
+  changeAgeGroupStatus,
+  removeAgeGroup,
+  pagination,
+} = useAgeGroup()
 
 // #------------- Watchers ---------------------------#
 watch(success, (value) => {
   if (value) {
-    fetchItems()
+    fetchAgeGroups()
   }
 })
 
 // #------------- Methods ---------------------------#
-const addItem = () => {
-  emit('openItemModal', { type: 'create', data: null })
+const addAgeGroup = () => {
+  emit('openAgeGroupModal', { type: 'create', data: null })
 }
 
-const editItem = (item) => {
-  emit('openItemModal', { type: 'edit', data: item })
+const editAgeGroup = (row) => {
+  emit('openAgeGroupModal', { type: 'edit', data: row })
 }
 
-const deleteItem = (item) => {
-  ElMessageBox.confirm(
-    `Are you sure you want to delete "${item.name}"? This action cannot be undone.`,
-    'Warning',
-    {
-      confirmButtonText: 'Yes, Delete',
-      cancelButtonText: 'Cancel',
-      type: 'warning',
-    },
-  )
-    .then(() => {
-      removeItem(item.id)
-    })
-    .catch(() => {
-      // User cancelled
-    })
+const deleteAgeGroup = (row) => {
+  ElMessageBox.confirm(`Are you sure you want to delete "${row.name}"?`, 'Warning', {
+    confirmButtonText: 'Yes, Delete',
+    cancelButtonText: 'Cancel',
+    type: 'warning',
+  }).then(() => removeAgeGroup(row.id))
 }
 
-const toggleStatus = (item) => {
-  const action = item.active ? 'deactivate' : 'activate'
-  ElMessageBox.confirm(`Are you sure you want to ${action} "${item.name}"?`, 'Warning', {
+const toggleStatus = (row) => {
+  const action = row.active ? 'deactivate' : 'activate'
+  ElMessageBox.confirm(`Are you sure you want to ${action} "${row.name}"?`, 'Warning', {
     confirmButtonText: `Yes, ${action}`,
     cancelButtonText: 'Cancel',
     type: 'warning',
-  })
-    .then(() => {
-      activateDeactivateItem(item.id)
-    })
-    .catch(() => {
-      // User cancelled
-    })
+  }).then(() => changeAgeGroupStatus(row.id))
 }
 
 const getNextData = (newPage) => {
   pagination.value.page = newPage
-  fetchItems()
+  fetchAgeGroups()
 }
 
 function changePageSize(newSize) {
   pagination.value.pageSize = newSize
   pagination.value.page = 1
-  fetchItems()
+  fetchAgeGroups()
 }
 
-const reloadItems = () => {
-  fetchItems()
+const reloadAgeGroups = () => {
+  fetchAgeGroups()
 }
 
 defineExpose({
-  reload: reloadItems,
+  reload: reloadAgeGroups,
 })
 </script>
 
 <template>
-  <div class="item-management">
+  <div class="age-groups-management">
     <el-row :gutter="20" class="pb-2">
       <el-col :span="24" class="text-right">
-        <el-button
-          v-if="hasPermission('CREATE_ITEMS')"
-          type="primary"
-          size="small"
-          plain
-          @click="addItem"
-        >
-          <Icon icon="mdi-light:plus-circle" width="14" height="14" /> Add New Item
+        <el-button type="primary" size="small" plain @click="addAgeGroup"  v-if="hasPermission('CREATE_ITEMS')">
+          <Icon icon="mdi-light:plus-circle" width="14" height="14" /> Add New Age Group
         </el-button>
       </el-col>
     </el-row>
 
     <BaseTable
       :pagination="pagination"
-      :rows="items"
+      :rows="ageGroups"
       :columns="columns"
       @update:page="getNextData"
       @update:pageSize="changePageSize"
@@ -126,8 +109,8 @@ defineExpose({
             size="small"
             plain
             round
-            title="Edit Item"
-            @click="editItem(scope.row)"
+            title="Edit Age Group"
+            @click="editAgeGroup(scope.row)"
           >
             <Icon icon="mdi-light:pencil" />
           </el-button>
@@ -148,8 +131,8 @@ defineExpose({
             size="small"
             plain
             round
-            title="Delete Item"
-            @click="deleteItem(scope.row)"
+            title="Delete Age Group"
+            @click="deleteAgeGroup(scope.row)"
           >
             <Icon icon="mdi-light:delete" />
           </el-button>
@@ -161,7 +144,7 @@ defineExpose({
 </template>
 
 <style scoped>
-.item-management {
+.age-groups-management {
   padding: 20px 0;
 }
 </style>
