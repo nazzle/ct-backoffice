@@ -1,6 +1,8 @@
 <script setup>
-import { reactive, ref, watch } from 'vue'
+import { onMounted, ref, watch } from 'vue'
 import { useInventory } from '@/modules/inventory/composables/useInventory.js'
+import { useItem } from '@/modules/inventory/composables/useItem.js'
+import { useLocation } from '@/modules/inventory/composables/useLocation.js'
 
 // #------------- Props / Emits -------------#
 const emit = defineEmits(['completeInventoryCreate'])
@@ -13,6 +15,8 @@ const props = defineProps({
 
 // #------------- Reactive & Refs State -------------#
 const { saveInventory, updateInventoryDetails, success } = useInventory()
+const { getAllItemsList, allItems } = useItem()
+const { allLocations, getNonPaginatedLocationList } = useLocation()
 const inventoryForm = ref(null)
 const crudOption = ref('create')
 const inventoryId = ref(null)
@@ -21,8 +25,7 @@ const form = ref({
   item_id: '',
   location_id: '',
   quantity: 0,
-  min_quantity: 0,
-  max_quantity: 0,
+  reorder_level: 0,
   active: true,
 })
 
@@ -33,11 +36,9 @@ const rules = {
     { required: true, message: 'Quantity is required', trigger: 'blur' },
     { type: 'number', min: 0, message: 'Quantity must be a positive number', trigger: 'blur' },
   ],
-  min_quantity: [
+  reorder_level: [
+    { required: true, message: 'Min quantity is required', trigger: 'blur' },
     { type: 'number', min: 0, message: 'Min quantity must be a positive number', trigger: 'blur' },
-  ],
-  max_quantity: [
-    { type: 'number', min: 0, message: 'Max quantity must be a positive number', trigger: 'blur' },
   ],
 }
 
@@ -55,8 +56,7 @@ watch(
         item_id: '',
         location_id: '',
         quantity: 0,
-        min_quantity: 0,
-        max_quantity: 0,
+        reorder_level: 0,
         active: true,
       }
       inventoryId.value = null
@@ -69,6 +69,11 @@ watch(success, (value) => {
   if (value) {
     emit('completeInventoryCreate')
   }
+})
+
+onMounted(() => {
+  getAllItemsList()
+  getNonPaginatedLocationList()
 })
 
 // #------------- Methods -------------#
@@ -92,8 +97,7 @@ const resetForm = () => {
     item_id: '',
     location_id: '',
     quantity: 0,
-    min_quantity: 0,
-    max_quantity: 0,
+    reorder_level: 0,
     active: true,
   }
   crudOption.value = 'create'
@@ -117,11 +121,13 @@ const resetForm = () => {
               v-model="form.item_id"
               placeholder="Select item"
               clearable
+              filterable
               style="width: 100%"
             >
-              <!-- TODO: Populate with items from API -->
-              <el-option label="Item 1" value="1" />
-              <el-option label="Item 2" value="2" />
+              <el-option
+                v-for="(item, i) in allItems" :key="i"
+                :label="`${item.description} (${item.barcode})`" :value="item.id"
+              />
             </el-select>
           </el-form-item>
         </el-col>
@@ -131,11 +137,13 @@ const resetForm = () => {
               v-model="form.location_id"
               placeholder="Select location"
               clearable
+              filterable
               style="width: 100%"
             >
-              <!-- TODO: Populate with locations from API -->
-              <el-option label="Location 1" value="1" />
-              <el-option label="Location 2" value="2" />
+              <el-option
+                v-for="(item, i) in allLocations" :key="i"
+                :label="item.name" :value="item.id"
+              />
             </el-select>
           </el-form-item>
         </el-col>
@@ -161,9 +169,9 @@ const resetForm = () => {
 
       <el-row :gutter="20">
         <el-col :span="12">
-          <el-form-item label="Min Quantity" prop="min_quantity">
+          <el-form-item label="Min Quantity" prop="reorder_level">
             <el-input-number
-              v-model="form.min_quantity"
+              v-model="form.reorder_level"
               :min="0"
               placeholder="Enter minimum quantity"
               style="width: 100%"
@@ -171,14 +179,6 @@ const resetForm = () => {
           </el-form-item>
         </el-col>
         <el-col :span="12">
-          <el-form-item label="Max Quantity" prop="max_quantity">
-            <el-input-number
-              v-model="form.max_quantity"
-              :min="0"
-              placeholder="Enter maximum quantity"
-              style="width: 100%"
-            />
-          </el-form-item>
         </el-col>
       </el-row>
 

@@ -1,6 +1,8 @@
 <script setup>
-import { reactive, ref, watch } from 'vue'
+import { onMounted, ref, watch } from 'vue'
 import { useInventoryMovement } from '@/modules/inventory/composables/useInventoryMovement.js'
+import { useItem } from '@/modules/inventory/composables/useItem.js'
+import { useLocation } from '@/modules/inventory/composables/useLocation.js'
 
 // #------------- Props / Emits -------------#
 const emit = defineEmits(['completeInventoryMovementCreate'])
@@ -13,13 +15,18 @@ const props = defineProps({
 
 // #------------- Reactive & Refs State -------------#
 const { saveInventoryMovement, updateInventoryMovementDetails, success } = useInventoryMovement()
+const { getAllItemsList, allItems } = useItem()
+const { allLocations, getNonPaginatedLocationList } = useLocation()
 const movementForm = ref(null)
 const crudOption = ref('create')
 const movementId = ref(null)
+const fromLocationVisible = ref(false)
+const toLocationVisible = ref(false)
 
 const form = ref({
   item_id: '',
-  location_id: '',
+  from_location: '',
+  to_location: '',
   movement_type: '',
   quantity: 0,
   reference: '',
@@ -28,17 +35,19 @@ const form = ref({
 })
 
 const movementTypes = [
-  { label: 'In', value: 'IN' },
-  { label: 'Out', value: 'OUT' },
-  { label: 'Transfer', value: 'TRANSFER' },
-  { label: 'Adjustment', value: 'ADJUSTMENT' }
+  { label: 'In', value: 'in' },
+  { label: 'Out', value: 'out' },
+  { label: 'Transfer', value: 'transfer' }
 ]
 
 const rules = {
   item_id: [
     { required: true, message: 'Item is required', trigger: 'change' }
   ],
-  location_id: [
+  from_location: [
+    { required: true, message: 'Location is required', trigger: 'change' }
+  ],
+  to_location: [
     { required: true, message: 'Location is required', trigger: 'change' }
   ],
   movement_type: [
@@ -48,10 +57,6 @@ const rules = {
     { required: true, message: 'Quantity is required', trigger: 'blur' },
     { type: 'number', min: 1, message: 'Quantity must be greater than 0', trigger: 'blur' }
   ],
-  reference: [
-    { required: true, message: 'Reference is required', trigger: 'blur' },
-    { min: 2, max: 100, message: 'Reference must be between 2 and 100 characters', trigger: 'blur' }
-  ]
 }
 
 // #------------- Watchers -------------#
@@ -64,7 +69,8 @@ watch(() => props.movementDetails, (newVal) => {
     crudOption.value = 'create'
     form.value = {
       item_id: '',
-      location_id: '',
+      from_location: '',
+      to_location: '',
       movement_type: '',
       quantity: 0,
       reference: '',
@@ -81,10 +87,15 @@ watch(success, (value) => {
   }
 })
 
+onMounted(() => {
+  getAllItemsList()
+  getNonPaginatedLocationList()
+})
+
 // #------------- Methods -------------#
 const submitForm = async () => {
   if (!movementForm.value) return
-  
+
   await movementForm.value.validate(async (valid) => {
     if (valid) {
       if (crudOption.value === 'create') {
@@ -100,7 +111,8 @@ const resetForm = () => {
   movementForm.value?.resetFields()
   form.value = {
     item_id: '',
-    location_id: '',
+    from_location: '',
+    to_location: '',
     movement_type: '',
     quantity: 0,
     reference: '',
@@ -109,6 +121,22 @@ const resetForm = () => {
   }
   crudOption.value = 'create'
   movementId.value = null
+}
+
+const checkMovementType = () => {
+  if (form.value?.movement_type === 'in') {
+    toLocationVisible.value = true
+    fromLocationVisible.value = false
+  } else if (form.value?.movement_type === 'out') {
+    toLocationVisible.value = false
+    fromLocationVisible.value = true
+  } else if (form.value?.movement_type === 'transfer') {
+    toLocationVisible.value = true
+    fromLocationVisible.value = true
+  } else {
+    toLocationVisible.value = false
+    fromLocationVisible.value = false
+  }
 }
 </script>
 
@@ -127,45 +155,13 @@ const resetForm = () => {
             <el-select
               v-model="form.item_id"
               placeholder="Select item"
-              clearable
-              style="width: 100%"
-            >
-              <!-- TODO: Populate with items from API -->
-              <el-option label="Item 1" value="1" />
-              <el-option label="Item 2" value="2" />
-            </el-select>
-          </el-form-item>
-        </el-col>
-        <el-col :span="12">
-          <el-form-item label="Location" prop="location_id">
-            <el-select
-              v-model="form.location_id"
-              placeholder="Select location"
-              clearable
-              style="width: 100%"
-            >
-              <!-- TODO: Populate with locations from API -->
-              <el-option label="Location 1" value="1" />
-              <el-option label="Location 2" value="2" />
-            </el-select>
-          </el-form-item>
-        </el-col>
-      </el-row>
-
-      <el-row :gutter="20">
-        <el-col :span="12">
-          <el-form-item label="Movement Type" prop="movement_type">
-            <el-select
-              v-model="form.movement_type"
-              placeholder="Select movement type"
+              filterable
               clearable
               style="width: 100%"
             >
               <el-option
-                v-for="type in movementTypes"
-                :key="type.value"
-                :label="type.label"
-                :value="type.value"
+                v-for="(item, i) in allItems" :key="i"
+                :label="`${item.description} - ${item.barcode} (Qty: ${item.inventory.quantity})`" :value="item.id"
               />
             </el-select>
           </el-form-item>
@@ -184,6 +180,24 @@ const resetForm = () => {
 
       <el-row :gutter="20">
         <el-col :span="12">
+          <el-form-item label="Type" prop="movement_type">
+            <el-select
+              v-model="form.movement_type"
+              placeholder="Select movement type"
+              clearable
+              style="width: 100%"
+              @change="checkMovementType"
+            >
+              <el-option
+                v-for="type in movementTypes"
+                :key="type.value"
+                :label="type.label"
+                :value="type.value"
+              />
+            </el-select>
+          </el-form-item>
+        </el-col>
+        <el-col :span="12">
           <el-form-item label="Reference" prop="reference">
             <el-input
               v-model="form.reference"
@@ -192,6 +206,44 @@ const resetForm = () => {
             />
           </el-form-item>
         </el-col>
+      </el-row>
+
+      <el-row :gutter="20">
+        <el-col :span="12" v-if="fromLocationVisible">
+          <el-form-item label="From" prop="from_location">
+            <el-select
+              v-model="form.from_location"
+              placeholder="Select source location"
+              clearable
+              filterable
+              style="width: 100%"
+            >
+              <el-option
+                v-for="(item, i) in allLocations" :key="i"
+                :label="item.name" :value="item.id"
+              />
+            </el-select>
+          </el-form-item>
+        </el-col>
+        <el-col :span="12" v-if="toLocationVisible">
+          <el-form-item label="To" prop="to_location">
+            <el-select
+              v-model="form.to_location"
+              placeholder="Select destination location"
+              clearable
+              filterable
+              style="width: 100%"
+            >
+              <el-option
+                v-for="(item, i) in allLocations" :key="i"
+                :label="item.name" :value="item.id"
+              />
+            </el-select>
+          </el-form-item>
+        </el-col>
+      </el-row>
+
+      <el-row :gutter="20">
         <el-col :span="12">
           <el-form-item label="Status">
             <el-switch
@@ -200,6 +252,8 @@ const resetForm = () => {
               inactive-text="Inactive"
             />
           </el-form-item>
+        </el-col>
+        <el-col :span="12">
         </el-col>
       </el-row>
 

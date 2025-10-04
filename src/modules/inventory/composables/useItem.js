@@ -12,6 +12,7 @@ import { usePagination } from '@/composables/usePagination.js'
 
 export function useItem() {
   const items = ref([])
+  const allItems = ref([])
   const loading = ref(false)
   const error = ref(null)
   const success = ref(false)
@@ -124,7 +125,7 @@ export function useItem() {
       const response = await getAllItems()
       const responseObj = response.data
       if (responseObj.status === true) {
-        return responseObj?.data || []
+        allItems.value = responseObj?.items || []
       }
     } catch (error) {
       console.log('Error fetching all items:', error)
@@ -147,5 +148,6 @@ export function useItem() {
     activateDeactivateItem,
     removeItem,
     getAllItemsList,
+    allItems
   }
 }

@@ -26,10 +26,10 @@ export function useInventory() {
       const response = await getInventory(pagination.value.page, pagination.value.pageSize)
       const responseObj = response.data
       if (responseObj.status === true) {
-        inventory.value = responseObj?.inventory?.data || responseObj?.data || []
-        pagination.value.page = responseObj.inventory?.current_page || responseObj.current_page || 1
-        pagination.value.pageSize = responseObj.inventory?.per_page || responseObj.per_page || 10
-        pagination.value.totalItems = responseObj.inventory?.total || responseObj.total || 0
+        inventory.value = responseObj?.inventories?.data || responseObj?.data || []
+        pagination.value.page = responseObj.inventories?.current_page || responseObj.current_page || 1
+        pagination.value.pageSize = responseObj.inventories?.per_page || responseObj.per_page || 10
+        pagination.value.totalItems = responseObj.inventories?.total || responseObj.total || 0
       } else {
         ElMessage.error(responseObj.message || 'Failed to fetch inventory')
       }

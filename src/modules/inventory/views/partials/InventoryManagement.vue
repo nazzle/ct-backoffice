@@ -1,5 +1,5 @@
 <script setup>
-import { ref, watch } from 'vue'
+import { watch } from 'vue'
 import { useInventory } from '@/modules/inventory/composables/useInventory.js'
 import { ElMessageBox } from 'element-plus'
 import BaseTable from '@/components/globals/BaseTable.vue'
@@ -12,11 +12,8 @@ const emit = defineEmits(['openInventoryModal'])
 const columns = [
   { key: 'id', label: 'S/N', type: 'index' },
   { key: 'active', label: 'Status' },
-  { key: 'item_name', label: 'Item' },
-  { key: 'location_name', label: 'Location' },
   { key: 'quantity', label: 'Quantity' },
-  { key: 'min_quantity', label: 'Min Quantity' },
-  { key: 'max_quantity', label: 'Max Quantity' },
+  { key: 'reorder_level', label: 'Min Quantity' },
   { key: 'created_at', label: 'Created At' },
 ]
 
@@ -104,7 +101,7 @@ defineExpose({
     <el-row :gutter="20" class="pb-2">
       <el-col :span="24" class="text-right">
         <el-button
-          v-if="hasPermission('CREATE_INVENTORY')"
+          v-if="hasPermission('CREATE_RESTOCKING')"
           type="primary"
           size="small"
           plain
@@ -114,7 +111,6 @@ defineExpose({
         </el-button>
       </el-col>
     </el-row>
-
     <BaseTable
       :pagination="pagination"
       :rows="inventory"
@@ -124,6 +120,16 @@ defineExpose({
       style="width: 100%"
       v-loading="loading"
     >
+      <el-table-column label="Item">
+        <template #default="scope">
+          {{ scope.row?.item?.description }} ({{ scope.row?.item.barcode }})
+        </template>
+      </el-table-column>
+      <el-table-column label="Location">
+        <template #default="scope">
+          {{ scope.row?.location?.name }}
+        </template>
+      </el-table-column>
       <el-table-column label="Actions" width="200">
         <template #default="scope">
           <el-button
@@ -148,18 +154,6 @@ defineExpose({
           >
             <Icon :icon="`mdi-light:${scope.row.active ? 'eye-off' : 'eye'}`" />
           </el-button>
-          <!-- Optional Delete action
-          <el-button
-            type="danger"
-            size="small"
-            plain
-            round
-            title="Delete Inventory"
-            @click="deleteInventory(scope.row)"
-          >
-            <Icon icon="mdi-light:delete" />
-          </el-button>
-          -->
         </template>
       </el-table-column>
     </BaseTable>
