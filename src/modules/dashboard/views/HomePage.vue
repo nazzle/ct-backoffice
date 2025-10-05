@@ -17,7 +17,7 @@ const modules = [
   {
     name: 'Sales',
     logo: salesSvg,
-    path: '/',
+    path: '/home',
     permissions: 'VIEW_SALES_MODULE',
   },
   {
@@ -41,25 +41,25 @@ const modules = [
   {
     name: 'Restocking',
     logo: restockingSvg,
-    path: '/',
+    path: '/home',
     permissions: 'VIEW_RESTOCKING_MODULE',
   },
   {
     name: 'Expenses',
     logo: expensesSvg,
-    path: '/',
+    path: '/home',
     permissions: 'VIEW_EXPENSES_MODULE',
   },
   {
     name: 'Gift Cards',
     logo: giftCardsSvg,
-    path: '/',
+    path: '/home',
     permissions: 'VIEW_GIFT_CARDS_MODULE',
   },
   {
     name: 'Cash-Up',
     logo: cashUpSvg,
-    path: '/',
+    path: '/home',
     permissions: 'VIEW_CASH_UP_MODULE',
   },
   {
@@ -71,19 +71,19 @@ const modules = [
   {
     name: 'Notifications',
     logo: notificationsSvg,
-    path: '/',
+    path: '/home',
     permissions: 'VIEW_NOTIFICATIONS_MODULE',
   },
   {
     name: 'Reports',
     logo: reportsSvg,
-    path: '/',
+    path: '/home',
     permissions: 'VIEW_REPORTS_MODULE',
   },
   {
     name: 'Configurations',
     logo: configurationsSvg,
-    path: '/',
+    path: '/configurations/index',
     permissions: 'VIEW_CONFIGURATIONS_MODULE',
   },
 ]

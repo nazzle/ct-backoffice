@@ -60,7 +60,7 @@ const logout = () => {
           <RouterLink to="/suppliers/index" v-if="hasPermission('VIEW_SUPPLIERS_MODULE')" href="#" class="text-gray-300 hover:text-white transition-colors duration-200">Suppliers</RouterLink>
           <RouterLink to="/human-resources/index" v-if="hasPermission('VIEW_HR_MODULE')" href="#" class="text-gray-300 hover:text-white transition-colors duration-200">Employees</RouterLink>
           <a v-if="hasPermission('VIEW_REPORTS_MODULE')" href="#" class="text-gray-300 hover:text-white transition-colors duration-200">Reports</a>
-          <a v-if="hasPermission('VIEW_CONFIGURATIONS_MODULE')" href="#" class="text-gray-300 hover:text-white transition-colors duration-200">Configurations</a>
+          <RouterLink to="/configurations/index" v-if="hasPermission('VIEW_CONFIGURATIONS_MODULE')" href="#" class="text-gray-300 hover:text-white transition-colors duration-200">Configurations</RouterLink>
         </div>
       </nav>
     </header>
