@@ -1,15 +1,13 @@
 import api from '@/api/axios.js'
 
 // POS specific endpoints
-export const searchItems = (query, locationId = null) =>
-  api.get(`/pos/items/search`, {
-    params: { query, location_id: locationId },
+export const searchItems = (data) =>
+  api.get(`/inventories/search`, {
+    params: data,
   })
 
-export const getItemByBarcode = (barcode, locationId = null) =>
-  api.get(`/pos/items/barcode/${barcode}`, {
-    params: { location_id: locationId },
-  })
+export const getItemByBarcode = (data) =>
+  api.get(`/inventories/search`, {params: data})
 
 export const getAvailableStock = (itemId, locationId) =>
   api.get(`/pos/stock/check`, {

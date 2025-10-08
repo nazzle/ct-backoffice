@@ -17,17 +17,21 @@ export function usePOS() {
   const error = ref(null)
 
   const searchPOSItems = async (query, locationId = null) => {
-    if (!query || query.length < 2) {
+    if (!query) {
       searchResults.value = []
       return
     }
 
     loading.value = true
     try {
-      const response = await searchItems(query, locationId)
+      const data = {
+        location_id: locationId,
+        keyword: query,
+      }
+      const response = await searchItems(data)
       const responseObj = response.data
       if (responseObj.status === true) {
-        searchResults.value = responseObj?.items || []
+        searchResults.value = responseObj?.inventories || []
       } else {
         searchResults.value = []
       }
@@ -42,10 +46,15 @@ export function usePOS() {
   const scanBarcode = async (barcode, locationId = null) => {
     loading.value = true
     try {
-      const response = await getItemByBarcode(barcode, locationId)
+      const data = {
+        location_id: locationId,
+        keyword: barcode,
+      }
+      console.log('Data: ',data)
+      const response = await getItemByBarcode(data)
       const responseObj = response.data
       if (responseObj.status === true) {
-        return responseObj?.item
+        return responseObj?.inventories
       } else {
         ElMessage.warning(responseObj.message || 'Item not found')
         return null

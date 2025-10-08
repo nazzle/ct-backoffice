@@ -60,7 +60,7 @@ export function useCart() {
 
   // Calculate item subtotal
   const getItemSubtotal = (item) => {
-    return item.selling_price * item.quantity
+    return item?.item.selling_price * item.quantity
   }
 
   // Calculate item discount amount

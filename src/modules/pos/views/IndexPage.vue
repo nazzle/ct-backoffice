@@ -10,7 +10,7 @@ const activeTab = ref('pos')
 <template>
   <div class="pos-module">
     <el-tabs v-model="activeTab" type="border-card" class="pos-tabs">
-      <el-tab-pane label="Point of Sale" name="pos" v-if="hasPermission('CREATE_SALES')">
+      <el-tab-pane label="Point of Sale" name="pos" v-if="hasPermission('VIEW_SALES')">
         <POSInterface />
       </el-tab-pane>
 

@@ -8,14 +8,14 @@ import { useCustomer } from '@/modules/reference-data/composables/useCustomer.js
 import { useTax } from '@/modules/configuration/composables/useTax.js'
 import { useDiscountDefinition } from '@/modules/configuration/composables/useDiscountDefinition.js'
 import { usePaymentOption } from '@/modules/configuration/composables/usePaymentOption.js'
-import { useUser } from '@/composables/useUser.js'
+import { useUser } from '@/modules/hr/composables/useUser.js'
 import { ElMessage, ElMessageBox } from 'element-plus'
 
 // Composables
 const cart = useCart()
 const pos = usePOS()
 const sales = useSales()
-const { allLocations, getNonPaginatedLocations } = useLocation()
+const { allLocations, getNonPaginatedLocationList } = useLocation()
 const { allCustomers, getNonPaginatedCustomers } = useCustomer()
 const { allTaxes, getNonPaginatedTaxes } = useTax()
 const { allDiscountDefinitions, getNonPaginatedDiscountDefinitions } = useDiscountDefinition()
@@ -41,7 +41,7 @@ const paymentReference = ref('')
 // Lifecycle
 onMounted(() => {
   getUserProfile()
-  getNonPaginatedLocations()
+  getNonPaginatedLocationList()
   getNonPaginatedCustomers()
   getNonPaginatedTaxes()
   getNonPaginatedDiscountDefinitions()
@@ -93,8 +93,16 @@ const formattedTime = computed(() => {
 // Methods
 const handleBarcodeSearch = async () => {
   if (!barcodeInput.value) return
-
   const item = await pos.scanBarcode(barcodeInput.value, cart.selectedLocation.value?.id)
+  if (item) {
+    cart.addToCart(item, 1)
+  }
+  barcodeInput.value = ''
+}
+
+const handleItemSearch = async () => {
+  if (!searchQuery.value) return
+  const item = await pos.searchPOSItems(searchQuery.value, cart.selectedLocation.value?.id)
   if (item) {
     cart.addToCart(item, 1)
   }
@@ -278,6 +286,7 @@ const clearCart = async () => {
             placeholder="Search products..."
             class="search-input"
             clearable
+            @keyup="handleItemSearch"
           >
             <template #prefix>
               <Icon icon="mdi:magnify" width="20" height="20" />
@@ -305,9 +314,9 @@ const clearCart = async () => {
           >
             <div class="product-image">
               <img
-                v-if="item.image"
-                :src="item.image"
-                :alt="item.description"
+                v-if="item?.image"
+                :src="item?.item?.image"
+                :alt="item?.item?.description"
                 @error="(e) => (e.target.src = '/placeholder-product.png')"
               />
               <div v-else class="placeholder-image">
@@ -315,9 +324,9 @@ const clearCart = async () => {
               </div>
             </div>
             <div class="product-info">
-              <div class="product-name">{{ item.description }}</div>
-              <div class="product-code">{{ item.barcode }}</div>
-              <div class="product-price">{{ item.selling_price?.toFixed(2) }}</div>
+              <div class="product-name">{{ item?.item?.description }}</div>
+              <div class="product-code">{{ item?.item?.barcode }}</div>
+              <div class="product-price">{{ item?.item?.selling_price }}</div>
             </div>
           </div>
         </div>
@@ -356,11 +365,10 @@ const clearCart = async () => {
             <Icon icon="mdi:cart-outline" width="64" height="64" />
             <p>Cart is empty</p>
           </div>
-
           <div v-for="item in cart.cartItems.value" :key="item.id" class="cart-item">
             <div class="item-details">
-              <div class="item-name">{{ item.description }}</div>
-              <div class="item-price">{{ item.selling_price?.toFixed(2) }} each</div>
+              <div class="item-name">{{ item?.item?.description }}</div>
+              <div class="item-price">{{ item?.item?.selling_price }} each</div>
               <div v-if="item.discount > 0" class="item-discount">
                 Discount:
                 {{ item.discount_type === 'percentage' ? `${item.discount}%` : item.discount }}
@@ -702,7 +710,7 @@ const clearCart = async () => {
   box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06);
   display: flex;
   flex-direction: column;
-  overflow: hidden;
+  overflow-y: scroll;
 }
 
 .search-container {
