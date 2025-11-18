@@ -2,7 +2,7 @@
 // #------------- Imports Here -------------#
 import logo from '@/assets/logo.png'
 import useLogin from '@/composables/useLogin.js'
-import { ref } from 'vue'
+import { onMounted, ref } from 'vue'
 import { ElMessage } from 'element-plus'
 
 
@@ -10,12 +10,17 @@ import { ElMessage } from 'element-plus'
 
 // #------------- Reactive & Refs State -------------#
 const loginForm = ref(null)
-const { loginFormObject, loading, error, submit, success } = useLogin()
+const {
+  loginFormObject, loading, error, submit, success, getActiveLocationsList, activeLocations
+} = useLogin()
 
 
 // #------------- Computed Properties -------------#
 
 // #------------- Watchers -------------#
+onMounted(() => {
+  getActiveLocationsList()
+})
 
 // #------------- Functions/Methods -------------#
 const submitLogin = () => {
@@ -26,7 +31,7 @@ const submitLogin = () => {
         ElMessage.error(error.value)
       }
     } else {
-      ElMessage.error('Both username and password are required!')
+      ElMessage.error('Username, Password and Location are required!')
     }
   })
 }
@@ -53,6 +58,13 @@ const submitLogin = () => {
                 </el-form-item>
                 <el-form-item class="mb-6" label="Password" prop="password" required>
                   <el-input v-model="loginFormObject.password" type="password" clearable placeholder="Password" />
+                </el-form-item>
+                <el-form-item class="mb-6" label="Location" prop="location_id" required>
+                  <el-select v-model="loginFormObject.location_id" clearable filterable placeholder="Select Location">
+                    <el-option
+                    v-for="(item, i) in activeLocations" :key="i" :label="item.name" :value="item.id"
+                    />
+                  </el-select>
                 </el-form-item>
                 <div v-if="error" class="text-red-600 text-center">
                   <span><small>{{error}}</small></span>

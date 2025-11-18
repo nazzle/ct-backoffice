@@ -14,6 +14,7 @@ export const useAuthStore = defineStore('auth', () => {
   const error = ref(null)
   const token_expiry = ref(null)
   const logoutResponse = ref(null)
+  const location = ref(null)
 
   // Initialize auth state from localStorage
   if (token.value) {
@@ -22,16 +23,17 @@ export const useAuthStore = defineStore('auth', () => {
   }
 
   // Actions
-  const login = async (username, password) => {
+  const login = async (username, password, location_id) => {
     loading.value = true
     error.value = null
 
     try {
-      const response = await api.post('/login', {username, password})
+      const response = await api.post('/login', {username, password, location_id})
       token.value = response.data?.auth_object?.access_token
       user.value = response.data?.auth_object?.username
       isAuthenticated.value = true
       token_expiry.value = response.data?.auth_object?.expires_at
+      location.value = response.data?.auth_object?.location
 
       const roles = response.data?.auth_object?.roles[0]
       const user_roles = {
@@ -41,14 +43,14 @@ export const useAuthStore = defineStore('auth', () => {
         }),
       }
 
-      console.log('Perms to be stored: ',user_roles.permissions)
-
       // Store token in localStorage
       localStorage.setItem('token', token.value)
       localStorage.setItem('token_expire', token_expiry.value)
       localStorage.setItem('user', user.value)
       localStorage.setItem('role', user_roles.role)
       localStorage.setItem('permissions', JSON.stringify(user_roles.permissions))
+      localStorage.setItem('location', location.value?.name)
+      localStorage.setItem('location_id', location.value?.id)
 
       // Set default auth header
       axios.defaults.headers.common['Authorization'] = `Bearer ${token.value}`

@@ -52,6 +52,10 @@ onMounted(() => {
   setInterval(() => {
     currentTime.value = new Date()
   }, 1000)
+
+  const userData = {
+    location: localStorage.getItem('location')
+  }
 })
 
 // Watchers
@@ -175,6 +179,8 @@ const savePendingSale = async () => {
     status: 'pending',
   }
 
+  console.log('Sale Data: ',saleData)
+
   const result = await sales.saveSale(saleData, true)
 
   if (sales.success.value) {
@@ -238,6 +244,7 @@ const clearCart = async () => {
     cart.clearCart()
   } catch (error) {
     // User cancelled
+    console.log('Error object while clearing cart: ',error)
   }
 }
 </script>
@@ -255,22 +262,25 @@ const clearCart = async () => {
         <div class="time-display">{{ formattedTime }}</div>
       </div>
       <div class="header-right">
-        <el-select
-          v-model="cart.selectedLocation.value"
-          placeholder="Select Location"
-          class="location-select"
-          value-key="id"
-        >
-          <el-option
-            v-for="location in allLocations"
-            :key="location.id"
-            :label="location.name"
-            :value="location"
-          />
-        </el-select>
+<!--        <el-select-->
+<!--          v-model="cart.selectedLocation.value"-->
+<!--          placeholder="Select Location"-->
+<!--          class="location-select"-->
+<!--          value-key="id"-->
+<!--        >-->
+<!--          <el-option-->
+<!--            v-for="location in allLocations"-->
+<!--            :key="location.id"-->
+<!--            :label="location.name"-->
+<!--            :value="location"-->
+<!--          />-->
+<!--        </el-select>-->
+        <el-input :placeholder="myProfile?.location" disabled>
+          <template #prepend><Icon icon="mdi:location" width="24" height="24" /></template>
+        </el-input>
         <div class="cashier-info">
           <Icon icon="mdi:account-circle" width="24" height="24" />
-          <span>{{ myProfile?.name || 'Cashier' }}</span>
+          <span>{{ myProfile?.roles[0]?.name || 'No User Details' }}</span>
         </div>
       </div>
     </div>
@@ -461,7 +471,7 @@ const clearCart = async () => {
               </el-button>
             </el-col>
           </el-row>
-          <el-row :gutter="10" class="mt-2">
+          <el-row :gutter="10" class="pt-2">
             <el-col :span="12">
               <el-button
                 type="danger"
@@ -535,7 +545,7 @@ const clearCart = async () => {
           :value="discount"
         />
       </el-select>
-      <div class="mt-3">
+      <div class="pt-3">
         <el-select
           :model-value="cart.appliedTax.value"
           placeholder="Select tax..."
