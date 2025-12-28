@@ -50,7 +50,6 @@ export function usePOS() {
         location_id: locationId,
         keyword: barcode,
       }
-      console.log('Data: ',data)
       const response = await getItemByBarcode(data)
       const responseObj = response.data
       if (responseObj.status === true) {

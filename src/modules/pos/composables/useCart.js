@@ -23,7 +23,7 @@ export function useCart() {
         discount: 0,
         discount_type: 'fixed', // fixed or percentage
       })
-      ElMessage.success(`Added ${item.description} to cart`)
+      ElMessage.success(`Added ${item?.item?.description} to cart`)
     }
   }
 
@@ -60,7 +60,7 @@ export function useCart() {
 
   // Calculate item subtotal
   const getItemSubtotal = (item) => {
-    return item?.item.selling_price * item.quantity
+    return item?.item?.selling_price * item.quantity
   }
 
   // Calculate item discount amount

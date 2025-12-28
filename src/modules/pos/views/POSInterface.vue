@@ -98,6 +98,7 @@ const formattedTime = computed(() => {
 const handleBarcodeSearch = async () => {
   if (!barcodeInput.value) return
   const item = await pos.scanBarcode(barcodeInput.value, cart.selectedLocation.value?.id)
+  console.log('barcode item data: ',item)
   if (item) {
     cart.addToCart(item, 1)
   }
@@ -124,7 +125,8 @@ const openPaymentDialog = () => {
     ElMessage.warning('Cart is empty')
     return
   }
-  if (!cart.selectedLocation.value) {
+  // if (!cart.selectedLocation.value) {
+  if (cart.selectedLocation.value) {
     ElMessage.warning('Please select a location')
     return
   }
@@ -143,6 +145,8 @@ const completeSale = async () => {
     ElMessage.warning('Amount received is less than total')
     return
   }
+
+  console.log('Cart for payment: ',cart.totalAfterDiscount.value)
 
   const saleData = {
     ...cart.getCartData(),

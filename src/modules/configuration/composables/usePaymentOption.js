@@ -47,7 +47,7 @@ export function usePaymentOption() {
       const response = await getAllPaymentOptions()
       const responseObj = response.data
       if (responseObj.status === true) {
-        allPaymentOptions.value = responseObj?.paymentOptions || []
+        allPaymentOptions.value = responseObj?.payment_options || []
       } else {
         ElMessage.error(responseObj.message)
       }
