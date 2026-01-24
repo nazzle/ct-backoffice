@@ -11,6 +11,7 @@ export function useCart() {
 
   // Add item to cart
   const addToCart = (item, quantity = 1) => {
+    console.log('Item: ', item)
     const existingItem = cartItems.value.find((i) => i.id === item.id)
 
     if (existingItem) {
@@ -33,7 +34,7 @@ export function useCart() {
     if (index > -1) {
       const item = cartItems.value[index]
       cartItems.value.splice(index, 1)
-      ElMessage.info(`Removed ${item.description} from cart`)
+      ElMessage.info(`Removed ${item?.item?.description} from cart`)
     }
   }
 
@@ -179,6 +180,7 @@ export function useCart() {
 
   // Get cart data for API
   const getCartData = () => {
+    console.log('Cart data item: ', cartItems)
     return {
       customer_id: selectedCustomer.value?.id || null,
       location_id: selectedLocation.value?.id || null,

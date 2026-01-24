@@ -711,7 +711,7 @@ const clearCart = async () => {
 .pos-main {
   flex: 1;
   display: grid;
-  grid-template-columns: 1fr 450px;
+  grid-template-columns: 550px 1fr;
   gap: 1rem;
   padding: 1rem;
   overflow: hidden;
@@ -735,7 +735,7 @@ const clearCart = async () => {
 }
 
 .search-input {
-  flex: 2;
+  flex: 1;
 }
 
 .barcode-input {
