@@ -146,8 +146,6 @@ const completeSale = async () => {
     return
   }
 
-  console.log('Cart for payment: ',cart.totalAfterDiscount.value)
-
   const saleData = {
     ...cart.getCartData(),
     payment_method_id: paymentMethod.value,
@@ -155,8 +153,12 @@ const completeSale = async () => {
     change: change.value,
     payment_reference: paymentReference.value,
     cashier_id: myProfile.value?.id,
+    location_id: Number(myProfile.value?.location_id),
     status: 'completed',
   }
+
+  console.log('Sale data: ',saleData)
+  console.log('Cart data: ',cart.getCartData())
 
   const result = await sales.saveSale(saleData, false)
 

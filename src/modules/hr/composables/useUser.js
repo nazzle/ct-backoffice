@@ -121,6 +121,7 @@ export function useUser() {
         myProfile.value = {
           ...responseObj?.user,
           location: localStorage.location ?? null,
+          location_id: localStorage.location_id ?? null,
         }
       } else {
         ElMessage.error(response?.data?.message)

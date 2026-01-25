@@ -183,11 +183,11 @@ export function useCart() {
     console.log('Cart data item: ', cartItems)
     return {
       customer_id: selectedCustomer.value?.id || null,
-      location_id: selectedLocation.value?.id || null,
       items: cartItems.value.map((item) => ({
-        item_id: item.id,
+        item_id: item?.item.id,
         quantity: item.quantity,
-        unit_price: item.selling_price,
+        unit_price: Number(item?.item.selling_price),
+        total_price: getItemSubtotal(item),
         discount: item.discount,
         discount_type: item.discount_type,
       })),
