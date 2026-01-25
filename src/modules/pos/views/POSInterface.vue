@@ -157,9 +157,6 @@ const completeSale = async () => {
     status: 'completed',
   }
 
-  console.log('Sale data: ',saleData)
-  console.log('Cart data: ',cart.getCartData())
-
   const result = await sales.saveSale(saleData, false)
 
   if (sales.success.value) {

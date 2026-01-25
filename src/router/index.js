@@ -8,6 +8,7 @@ import { supplierRoutes } from '@/modules/supplier/router/index.js'
 import { referenceDataRoutes } from '@/modules/reference-data/router/index.js'
 import { configurationsRoutes } from '@/modules/configuration/router/index.js'
 import { posRoutes } from '@/modules/pos/router/index.js'
+import { saleRoutes } from '@/modules/sale/router/index.js'
 
 const router = createRouter({
   history: createWebHistory(import.meta.env.BASE_URL),
@@ -30,6 +31,7 @@ const router = createRouter({
     ...referenceDataRoutes,
     ...configurationsRoutes,
     ...posRoutes,
+    ...saleRoutes
   ],
 })
 

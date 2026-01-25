@@ -13,8 +13,7 @@ const activeTab = ref('all')
 
 const columns = [
   { key: 'id', label: 'Sale #', type: 'index' },
-  { key: 'created_at', label: 'Date' },
-  { key: 'total', label: 'Total' },
+  { key: 'sale_number', label: 'Sale Number' },
 ]
 
 onMounted(() => {
@@ -86,12 +85,12 @@ const getStatusType = (status) => {
           </el-table-column>
           <el-table-column label="Cashier">
             <template #default="scope">
-              {{ scope.row.cashier?.name || 'N/A' }}
+              {{ scope.row.user?.username || 'N/A' }}
             </template>
           </el-table-column>
           <el-table-column label="Payment Method">
             <template #default="scope">
-              {{ scope.row.payment_method?.name || 'N/A' }}
+              {{ scope.row.payment_options?.name || 'N/A' }}
             </template>
           </el-table-column>
           <el-table-column prop="created_at" label="Date">
@@ -108,7 +107,12 @@ const getStatusType = (status) => {
           </el-table-column>
           <el-table-column label="Total" align="right">
             <template #default="scope">
-              <strong>{{ scope.row.total?.toFixed(2) }}</strong>
+              <strong>{{ scope.row.total_amount }}</strong>
+            </template>
+          </el-table-column>
+          <el-table-column label="Paid" align="right">
+            <template #default="scope">
+              <strong>{{ scope.row.amount_paid }}</strong>
             </template>
           </el-table-column>
           <el-table-column label="Actions" width="180">

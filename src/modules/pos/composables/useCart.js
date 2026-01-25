@@ -11,7 +11,6 @@ export function useCart() {
 
   // Add item to cart
   const addToCart = (item, quantity = 1) => {
-    console.log('Item: ', item)
     const existingItem = cartItems.value.find((i) => i.id === item.id)
 
     if (existingItem) {

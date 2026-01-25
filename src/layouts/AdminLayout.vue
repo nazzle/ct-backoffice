@@ -56,7 +56,7 @@ const logout = () => {
         <div class="flex gap-4 text-sm overflow-x-hidden">
           <RouterLink to="/home" class="text-gray-300 hover:text-white transition-colors duration-200 flex gap-1 items-center"><Icon icon="mdi-light:home" width="17" height="17" /> Home</RouterLink>
           <RouterLink to="/pos/index" v-if="hasPermission('VIEW_POS_MODULE')" class="text-gray-300 hover:text-white transition-colors duration-200">POS</RouterLink>
-          <a v-if="hasPermission('VIEW_SALES_MODULE')" href="#" class="text-gray-300 hover:text-white transition-colors duration-200">Sales</a>
+          <RouterLink to="/sales/index" v-if="hasPermission('VIEW_SALES_MODULE')" class="text-gray-300 hover:text-white transition-colors duration-200">Sales</RouterLink>
           <RouterLink to="/inventory/index" v-if="hasPermission('VIEW_INVENTORY_MODULE')" class="text-gray-300 hover:text-white transition-colors duration-200">Inventory</RouterLink>
           <RouterLink to="/suppliers/index" v-if="hasPermission('VIEW_SUPPLIERS_MODULE')" class="text-gray-300 hover:text-white transition-colors duration-200">Suppliers</RouterLink>
           <RouterLink to="/reference-data/index" v-if="hasPermission('VIEW_CONFIGURATIONS')" class="text-gray-300 hover:text-white transition-colors duration-200">Reference Data</RouterLink>
