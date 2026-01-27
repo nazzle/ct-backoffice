@@ -10,7 +10,6 @@ import { useUser } from '@/modules/hr/composables/useUser.js'
 const { sales, fetchSales, cancelSaleTransaction, pagination, success } = useSales()
 const salesDetailDialog = ref(false)
 const selectedSale = ref(null)
-const activeTab = ref('all')
 const { myProfile, getUserProfile } = useUser()
 const locationId = ref(null)
 
@@ -125,11 +124,6 @@ const getStatusType = (status) => {
         <el-table-column label="Payment Method">
           <template #default="scope">
             {{ scope.row.payment_options?.name || 'N/A' }}
-          </template>
-        </el-table-column>
-        <el-table-column prop="created_at" label="Date">
-          <template #default="scope">
-            {{ dateFormatter(scope.row.created_at) }}
           </template>
         </el-table-column>
         <el-table-column label="Status">
