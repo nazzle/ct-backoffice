@@ -2,7 +2,7 @@
 import { ref } from 'vue'
 import { hasPermission } from '@/utils/permissions.js'
 import POSInterface from '@/modules/pos/views/POSInterface.vue'
-import SalesManagement from '@/modules/pos/views/SalesManagement.vue'
+import SalesPerLoggedInLocation from '@/modules/pos/views/SalesPerLoggedInLocation.vue'
 
 const activeTab = ref('pos')
 </script>
@@ -14,8 +14,12 @@ const activeTab = ref('pos')
         <POSInterface />
       </el-tab-pane>
 
+      <el-tab-pane label="Pending Sales" name="pending-sales" v-if="hasPermission('VIEW_SALES')">
+
+      </el-tab-pane>
+
       <el-tab-pane label="Sales History" name="sales" v-if="hasPermission('VIEW_SALES')">
-        <SalesManagement />
+        <SalesPerLoggedInLocation />
       </el-tab-pane>
     </el-tabs>
   </div>

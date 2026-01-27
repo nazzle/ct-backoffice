@@ -24,7 +24,7 @@ const modules = [
   {
     name: 'Sales',
     logo: salesSvg,
-    path: '/home',
+    path: '/sales/index',
     permissions: 'VIEW_SALES_MODULE',
   },
   {

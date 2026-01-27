@@ -3,32 +3,68 @@ import { onMounted, ref } from 'vue'
 import { useSales } from '@/modules/pos/composables/useSales.js'
 import BaseTable from '@/components/globals/BaseTable.vue'
 import { dateFormatter } from '@/components/globals/constants.js'
-import { ElMessage, ElMessageBox } from 'element-plus'
+import { ElMessageBox } from 'element-plus'
 import { hasPermission } from '@/utils/permissions.js'
+import { useUser } from '@/modules/hr/composables/useUser.js'
 
 const { sales, fetchSales, cancelSaleTransaction, pagination, success } = useSales()
 const salesDetailDialog = ref(false)
 const selectedSale = ref(null)
 const activeTab = ref('all')
+const { myProfile, getUserProfile } = useUser()
+const locationId = ref(null)
 
 const columns = [
   { key: 'id', label: 'Sale #', type: 'index' },
   { key: 'sale_number', label: 'Sale Number' },
 ]
 
-onMounted(() => {
-  fetchSales()
+// Get today's date range in format yyyy-mm-dd HH:mm:ss
+const getTodayDateRange = () => {
+  const today = new Date()
+  const year = today.getFullYear()
+  const month = String(today.getMonth() + 1).padStart(2, '0')
+  const day = String(today.getDate()).padStart(2, '0')
+
+  // Start of day: 00:00:00
+  const dateFrom = `${year}-${month}-${day} 00:00:00`
+
+  // End of day: 23:59:59
+  const dateTo = `${year}-${month}-${day} 23:59:59`
+
+  return { date_from: dateFrom, date_to: dateTo }
+}
+
+// Build params object with location_id and date range
+const buildSalesParams = () => {
+  const params = {}
+
+  if (locationId.value) {
+    params.location_id = Number(locationId.value)
+  }
+
+  const dateRange = getTodayDateRange()
+  params.date_from = dateRange.date_from
+  params.date_to = dateRange.date_to
+
+  return params
+}
+
+onMounted(async () => {
+  await getUserProfile()
+  locationId.value = myProfile.value?.location_id || localStorage.getItem('location_id')
+  fetchSales(buildSalesParams())
 })
 
 const getNextData = (newPage) => {
   pagination.value.page = newPage
-  fetchSales()
+  fetchSales(buildSalesParams())
 }
 
 function changePageSize(newSize) {
   pagination.value.pageSize = newSize
   pagination.value.page = 1
-  fetchSales()
+  fetchSales(buildSalesParams())
 }
 
 const viewSaleDetails = (sale) => {
@@ -46,9 +82,9 @@ const handleCancelSale = async (sale) => {
 
     await cancelSaleTransaction(sale.id)
     if (success.value) {
-      await fetchSales()
+      await fetchSales(buildSalesParams())
     }
-  } catch (error) {
+  } catch {
     // User cancelled
   }
 }
@@ -66,74 +102,70 @@ const getStatusType = (status) => {
 <template>
   <div class="sales-management">
     <div class="page-header">
-      <h2>Sales Management</h2>
+      <h2>Today's Sales</h2>
     </div>
 
-    <el-tabs v-model="activeTab" type="border-card">
-      <el-tab-pane label="All Sales" name="all">
-        <base-table
-          :pagination="pagination"
-          :rows="sales"
-          :columns="columns"
-          @update:page="getNextData"
-          @update:pageSize="changePageSize"
-        >
-          <el-table-column label="Customer">
-            <template #default="scope">
-              {{ scope.row.customer?.name || 'Walk-in' }}
-            </template>
-          </el-table-column>
-          <el-table-column label="Cashier">
-            <template #default="scope">
-              {{ scope.row.user?.username || 'N/A' }}
-            </template>
-          </el-table-column>
-          <el-table-column label="Payment Method">
-            <template #default="scope">
-              {{ scope.row.payment_options?.name || 'N/A' }}
-            </template>
-          </el-table-column>
-          <el-table-column prop="created_at" label="Date">
-            <template #default="scope">
-              {{ dateFormatter(scope.row.created_at) }}
-            </template>
-          </el-table-column>
-          <el-table-column label="Status">
-            <template #default="scope">
-              <el-tag :type="getStatusType(scope.row.status)">
-                {{ scope.row.status?.toUpperCase() }}
-              </el-tag>
-            </template>
-          </el-table-column>
-          <el-table-column label="Total" align="right">
-            <template #default="scope">
-              <strong>{{ scope.row.total_amount }}</strong>
-            </template>
-          </el-table-column>
-          <el-table-column label="Paid" align="right">
-            <template #default="scope">
-              <strong>{{ scope.row.amount_paid }}</strong>
-            </template>
-          </el-table-column>
-          <el-table-column label="Actions" width="180">
-            <template #default="scope">
-              <el-button size="small" plain type="primary" @click="viewSaleDetails(scope.row)">
-                <Icon icon="mdi:eye" /> View
-              </el-button>
-              <el-button
-                v-if="scope.row.status === 'pending' && hasPermission('DELETE_SALES')"
-                size="small"
-                plain
-                type="danger"
-                @click="handleCancelSale(scope.row)"
-              >
-                <Icon icon="mdi:cancel" />
-              </el-button>
-            </template>
-          </el-table-column>
-        </base-table>
-      </el-tab-pane>
-    </el-tabs>
+    <base-table
+        :pagination="pagination"
+        :rows="sales"
+        :columns="columns"
+        @update:page="getNextData"
+        @update:pageSize="changePageSize"
+      >
+        <el-table-column label="Customer">
+          <template #default="scope">
+            {{ scope.row.customer?.name || 'Walk-in' }}
+          </template>
+        </el-table-column>
+        <el-table-column label="Cashier">
+          <template #default="scope">
+            {{ scope.row.user?.username || 'N/A' }}
+          </template>
+        </el-table-column>
+        <el-table-column label="Payment Method">
+          <template #default="scope">
+            {{ scope.row.payment_options?.name || 'N/A' }}
+          </template>
+        </el-table-column>
+        <el-table-column prop="created_at" label="Date">
+          <template #default="scope">
+            {{ dateFormatter(scope.row.created_at) }}
+          </template>
+        </el-table-column>
+        <el-table-column label="Status">
+          <template #default="scope">
+            <el-tag :type="getStatusType(scope.row.status)">
+              {{ scope.row.status?.toUpperCase() }}
+            </el-tag>
+          </template>
+        </el-table-column>
+        <el-table-column label="Total" align="right">
+          <template #default="scope">
+            <strong>{{ scope.row.total_amount }}</strong>
+          </template>
+        </el-table-column>
+        <el-table-column label="Paid" align="right">
+          <template #default="scope">
+            <strong>{{ scope.row.amount_paid }}</strong>
+          </template>
+        </el-table-column>
+        <el-table-column label="Actions" width="180">
+          <template #default="scope">
+            <el-button size="small" plain type="primary" @click="viewSaleDetails(scope.row)">
+              <Icon icon="mdi:eye" /> View
+            </el-button>
+            <el-button
+              v-if="scope.row.status === 'pending' && hasPermission('DELETE_SALES')"
+              size="small"
+              plain
+              type="danger"
+              @click="handleCancelSale(scope.row)"
+            >
+              <Icon icon="mdi:cancel" />
+            </el-button>
+          </template>
+        </el-table-column>
+      </base-table>
 
     <!-- Sale Details Dialog -->
     <el-dialog
