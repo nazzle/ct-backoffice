@@ -51,7 +51,7 @@ function indexNumber(scope) {
             </el-tag>
           </template>
         </el-table-column>
-        <el-table-column v-else-if=" col.key === 'created_at' " label="Date Created">
+        <el-table-column v-else-if=" col.key === 'created_at' " label="Date">
           <template #default="scope">
             {{ dateFormatter(scope.row[col.key]) }}
           </template>

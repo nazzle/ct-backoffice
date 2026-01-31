@@ -5,6 +5,7 @@ import ItemsTypesManagement from '@/modules/reference-data/views/partials/ItemsT
 import ItemGendersManagements from '@/modules/reference-data/views/partials/ItemGendersManagements.vue'
 import CountriesManagement from '@/modules/reference-data/views/partials/CountriesManagement.vue'
 import AgeGroupsManagement from '@/modules/reference-data/views/partials/AgeGroupsManagement.vue'
+import CustomersManagement from '@/modules/reference-data/views/partials/CustomersManagement.vue'
 import ItemTypeForm from '@/modules/reference-data/views/partials/ItemTypeForm.vue'
 import ItemGenderForm from '@/modules/reference-data/views/partials/ItemGenderForm.vue'
 import CountryForm from '@/modules/reference-data/views/partials/CountryForm.vue'
@@ -121,6 +122,10 @@ const onAgeGroupCompleted = () => {
             <CountriesManagement ref="countriesRef" @openCountryModal="openCountryModal" />
           </el-tab-pane>
 
+          <!--   CUSTOMERS TAB   -->
+          <el-tab-pane label="Customers" v-if="hasPermission('VIEW_CUSTOMERS')">
+            <CustomersManagement />
+          </el-tab-pane>
         </el-tabs>
       </el-col>
 

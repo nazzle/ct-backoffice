@@ -1,5 +1,5 @@
 <script setup>
-import salesSvg from '@/assets/images/sales.svg'
+import posSvg from '@/assets/images/pos.svg'
 import inventorySvg from '@/assets/images/inventory.svg'
 import configurationsSvg from '@/assets/images/configurations.svg'
 import employeeSvg from '@/assets/images/employee.svg'
@@ -11,13 +11,20 @@ import giftCardsSvg from '@/assets/images/giftcard.svg'
 import notificationsSvg from '@/assets/images/notifications.svg'
 import restockingSvg from '@/assets/images/restocking.svg'
 import referenceDataSvg from '@/assets/images/referenceData.svg'
+import salesSvg from '@/assets/images/sales.svg'
 import { hasPermission } from '@/utils/permissions.js'
 
 const modules = [
   {
+    name: 'POS',
+    logo: posSvg,
+    path: '/pos/index',
+    permissions: 'VIEW_POS_MODULE',
+  },
+  {
     name: 'Sales',
     logo: salesSvg,
-    path: '/',
+    path: '/sales/index',
     permissions: 'VIEW_SALES_MODULE',
   },
   {
@@ -36,30 +43,30 @@ const modules = [
     name: 'Reference Data',
     logo: referenceDataSvg,
     path: '/reference-data/index',
-    permissions: 'VIEW_SUPPLIERS_MODULE',
+    permissions: 'VIEW_CONFIGURATIONS',
   },
   {
     name: 'Restocking',
     logo: restockingSvg,
-    path: '/',
+    path: '/home',
     permissions: 'VIEW_RESTOCKING_MODULE',
   },
   {
     name: 'Expenses',
     logo: expensesSvg,
-    path: '/',
+    path: '/home',
     permissions: 'VIEW_EXPENSES_MODULE',
   },
   {
     name: 'Gift Cards',
     logo: giftCardsSvg,
-    path: '/',
+    path: '/home',
     permissions: 'VIEW_GIFT_CARDS_MODULE',
   },
   {
     name: 'Cash-Up',
     logo: cashUpSvg,
-    path: '/',
+    path: '/home',
     permissions: 'VIEW_CASH_UP_MODULE',
   },
   {
@@ -71,19 +78,19 @@ const modules = [
   {
     name: 'Notifications',
     logo: notificationsSvg,
-    path: '/',
+    path: '/home',
     permissions: 'VIEW_NOTIFICATIONS_MODULE',
   },
   {
     name: 'Reports',
     logo: reportsSvg,
-    path: '/',
+    path: '/home',
     permissions: 'VIEW_REPORTS_MODULE',
   },
   {
     name: 'Configurations',
     logo: configurationsSvg,
-    path: '/',
+    path: '/configurations/index',
     permissions: 'VIEW_CONFIGURATIONS_MODULE',
   },
 ]

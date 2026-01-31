@@ -43,6 +43,7 @@ const onSubmit = () => {
     if (valid) {
       await saveCategoryDetails(form.value)
       if (success.value) {
+        categoryForm.value.resetFields()
         emits('completeCategoryAction')
       }
     }
@@ -54,6 +55,7 @@ const onUpdate = () => {
     if (valid) {
       await updateCategoryDetails(form.value)
       if (success.value) {
+        categoryForm.value.resetFields()
         emits('completeCategoryAction')
       }
     }
