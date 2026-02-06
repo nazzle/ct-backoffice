@@ -34,7 +34,7 @@ jobs:
           username: ${{ secrets.CPANEL_FTP_USER }}
           password: ${{ secrets.CPANEL_FTP_PASS }}
           local-dir: dist/
-          server-dir: pos.chekiitoto.tz/
+          server-dir: /public_html/pos/
 
 
       # Clean up dist/ after deploy
