@@ -1,15 +1,13 @@
 <script setup>
 import { watch } from 'vue'
-import { useInventory } from '@/modules/inventory/composables/useInventory.js'
+import { useInventoryRecord } from '@/modules/inventory/composables/useInventoryRecord.js'
 import { ElMessageBox } from 'element-plus'
 import BaseTable from '@/components/globals/BaseTable.vue'
 import { hasPermission } from '@/utils/permissions.js'
 import { dateFormatter } from '@/components/globals/constants.js'
 
-// #------------- Props / Emits ---------------------#
-const emit = defineEmits(['openInventoryModal'])
+const emit = defineEmits(['openInventoryRecordModal'])
 
-// #------------- Reactive & Refs State -------------#
 const columns = [
   { key: 'id', label: 'S/N', type: 'index' },
   { key: 'active', label: 'Status' },
@@ -17,34 +15,32 @@ const columns = [
 ]
 
 const {
-  inventory,
+  inventoryRecords,
   loading,
   success,
-  fetchInventory,
-  changeInventoryStatus,
-  removeInventory,
+  fetchInventoryRecords,
+  changeInventoryRecordStatus,
+  removeInventoryRecord,
   pagination,
-} = useInventory()
+} = useInventoryRecord()
 
-// #------------- Watchers ---------------------------#
 watch(success, (value) => {
   if (value) {
-    fetchInventory()
+    fetchInventoryRecords()
   }
 })
 
-// #------------- Methods ---------------------------#
-const addInventory = () => {
-  emit('openInventoryModal', { type: 'create', data: null })
+const addInventoryRecord = () => {
+  emit('openInventoryRecordModal', { type: 'create', data: null })
 }
 
-const editInventory = (inventoryItem) => {
-  emit('openInventoryModal', { type: 'edit', data: inventoryItem })
+const editInventoryRecord = (record) => {
+  emit('openInventoryRecordModal', { type: 'edit', data: record })
 }
 
-const deleteInventory = (inventoryItem) => {
+const deleteRecord = (record) => {
   ElMessageBox.confirm(
-    `Are you sure you want to delete this inventory record? This action cannot be undone.`,
+    'Are you sure you want to delete this inventory record? This action cannot be undone.',
     'Warning',
     {
       confirmButtonText: 'Yes, Delete',
@@ -53,22 +49,22 @@ const deleteInventory = (inventoryItem) => {
     },
   )
     .then(() => {
-      removeInventory(inventoryItem.id)
+      removeInventoryRecord(record.id)
     })
     .catch(() => {
       // User cancelled
     })
 }
 
-const toggleStatus = (inventoryItem) => {
-  const action = inventoryItem.active ? 'deactivate' : 'activate'
+const toggleStatus = (record) => {
+  const action = record.active ? 'deactivate' : 'activate'
   ElMessageBox.confirm(`Are you sure you want to ${action} this inventory record?`, 'Warning', {
     confirmButtonText: `Yes, ${action}`,
     cancelButtonText: 'Cancel',
     type: 'warning',
   })
     .then(() => {
-      changeInventoryStatus(inventoryItem.id)
+      changeInventoryRecordStatus(record.id)
     })
     .catch(() => {
       // User cancelled
@@ -77,42 +73,42 @@ const toggleStatus = (inventoryItem) => {
 
 const getNextData = (newPage) => {
   pagination.value.page = newPage
-  fetchInventory()
+  fetchInventoryRecords()
 }
 
 function changePageSize(newSize) {
   pagination.value.pageSize = newSize
   pagination.value.page = 1
-  fetchInventory()
+  fetchInventoryRecords()
 }
 
-const reloadInventory = () => {
-  fetchInventory()
+const reloadInventoryRecords = () => {
+  fetchInventoryRecords()
 }
 
 defineExpose({
-  reload: reloadInventory,
+  reload: reloadInventoryRecords,
 })
 </script>
 
 <template>
-  <div class="inventory-management">
+  <div class="inventory-record-management">
     <el-row :gutter="20" class="pb-2">
       <el-col :span="24" class="text-right">
         <el-button
-          v-if="hasPermission('CREATE_RESTOCKING')"
+          v-if="hasPermission('CREATE_INVENTORY_RECORDS')"
           type="primary"
           size="small"
           plain
-          @click="addInventory"
+          @click="addInventoryRecord"
         >
-          <Icon icon="mdi-light:plus-circle" width="14" height="14" /> Add New Inventory
+          <Icon icon="mdi-light:plus-circle" width="14" height="14" /> Add New Record
         </el-button>
       </el-col>
     </el-row>
     <BaseTable
       :pagination="pagination"
-      :rows="inventory"
+      :rows="inventoryRecords"
       :columns="columns"
       @update:page="getNextData"
       @update:pageSize="changePageSize"
@@ -121,7 +117,7 @@ defineExpose({
     >
       <el-table-column label="Item">
         <template #default="scope">
-          {{ scope.row?.item?.description }} ({{ scope.row?.item.barcode }})
+          {{ scope.row?.item?.description }} ({{ scope.row?.item?.barcode }})
         </template>
       </el-table-column>
       <el-table-column label="Location">
@@ -129,26 +125,31 @@ defineExpose({
           {{ scope.row?.location?.name }}
         </template>
       </el-table-column>
+      <el-table-column label="Reference">
+        <template #default="scope">
+          {{ scope.row?.reference || '-' }}
+        </template>
+      </el-table-column>
       <el-table-column label="Date">
         <template #default="scope">
           {{ dateFormatter(scope.row?.created_at) }}
         </template>
       </el-table-column>
-      <el-table-column label="Actions" width="200">
+      <el-table-column label="Actions" width="220">
         <template #default="scope">
           <el-button
-            v-if="hasPermission('UPDATE_INVENTORY')"
+            v-if="hasPermission('UPDATE_INVENTORY_RECORDS')"
             type="primary"
             size="small"
             plain
             round
-            title="Edit Inventory"
-            @click="editInventory(scope.row)"
+            title="Edit Record"
+            @click="editInventoryRecord(scope.row)"
           >
             <Icon icon="mdi-light:pencil" />
           </el-button>
           <el-button
-            v-if="hasPermission('DELETE_INVENTORY')"
+            v-if="hasPermission('UPDATE_INVENTORY_RECORDS')"
             :type="scope.row.active ? 'warning' : 'success'"
             size="small"
             plain
@@ -158,6 +159,17 @@ defineExpose({
           >
             <Icon :icon="`mdi-light:${scope.row.active ? 'eye-off' : 'eye'}`" />
           </el-button>
+          <el-button
+            v-if="hasPermission('DELETE_INVENTORY_RECORDS')"
+            type="danger"
+            size="small"
+            plain
+            round
+            title="Delete Record"
+            @click="deleteRecord(scope.row)"
+          >
+            <Icon icon="mdi-light:delete" />
+          </el-button>
         </template>
       </el-table-column>
     </BaseTable>
@@ -165,7 +177,7 @@ defineExpose({
 </template>
 
 <style scoped>
-.inventory-management {
+.inventory-record-management {
   padding: 20px 0;
 }
 </style>

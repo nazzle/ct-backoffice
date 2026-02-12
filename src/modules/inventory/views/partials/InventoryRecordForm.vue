@@ -1,35 +1,30 @@
 <script setup>
 import { onMounted, ref, watch } from 'vue'
-import { useInventory } from '@/modules/inventory/composables/useInventory.js'
+import { useInventoryRecord } from '@/modules/inventory/composables/useInventoryRecord.js'
 import { useItem } from '@/modules/inventory/composables/useItem.js'
 import { useLocation } from '@/modules/inventory/composables/useLocation.js'
-import { useSupplier } from '@/modules/supplier/composables/useSupplier'
-import { useCountry } from '@/modules/reference-data/composables/useCountry'
 
-// #------------- Props / Emits -------------#
-const emit = defineEmits(['completeInventoryCreate'])
+const emit = defineEmits(['completeInventoryRecordCreate'])
 const props = defineProps({
-  inventoryDetails: {
+  recordDetails: {
     type: Object,
     default: () => ({}),
   },
 })
 
-// #------------- Reactive & Refs State -------------#
-const { saveInventory, updateInventoryDetails, success } = useInventory()
+const { saveInventoryRecord, updateInventoryRecordDetails, success } = useInventoryRecord()
 const { getAllItemsList, allItems } = useItem()
 const { allLocations, getNonPaginatedLocationList } = useLocation()
-const { allSuppliers, getNonPaginatedSuppliersList } = useSupplier()
-const { allCountries, getAllCountriesList } = useCountry()
-const inventoryForm = ref(null)
+const recordForm = ref(null)
 const crudOption = ref('create')
-const inventoryId = ref(null)
+const recordId = ref(null)
 
 const form = ref({
   item_id: '',
   location_id: '',
   quantity: 0,
-  reorder_level: 0,
+  reference: '',
+  notes: '',
   active: true,
 })
 
@@ -40,19 +35,21 @@ const rules = {
     { required: true, message: 'Quantity is required', trigger: 'blur' },
     { type: 'number', min: 0, message: 'Quantity must be a positive number', trigger: 'blur' },
   ],
-  reorder_level: [
-    { required: true, message: 'Min quantity is required', trigger: 'blur' },
-    { type: 'number', min: 0, message: 'Min quantity must be a positive number', trigger: 'blur' },
-  ],
 }
 
-// #------------- Watchers -------------#
 watch(
-  () => props.inventoryDetails,
+  () => props.recordDetails,
   (newVal) => {
     if (newVal && Object.keys(newVal).length > 0) {
-      form.value = { ...newVal }
-      inventoryId.value = newVal.id
+      form.value = {
+        item_id: newVal.item_id ?? newVal.item?.id ?? '',
+        location_id: newVal.location_id ?? newVal.location?.id ?? '',
+        quantity: newVal.quantity ?? 0,
+        reference: newVal.reference ?? '',
+        notes: newVal.notes ?? '',
+        active: newVal.active ?? true,
+      }
+      recordId.value = newVal.id
       crudOption.value = 'update'
     } else {
       crudOption.value = 'create'
@@ -60,10 +57,11 @@ watch(
         item_id: '',
         location_id: '',
         quantity: 0,
-        reorder_level: 0,
+        reference: '',
+        notes: '',
         active: true,
       }
-      inventoryId.value = null
+      recordId.value = null
     }
   },
   { immediate: true },
@@ -71,50 +69,48 @@ watch(
 
 watch(success, (value) => {
   if (value) {
-    emit('completeInventoryCreate')
+    emit('completeInventoryRecordCreate')
   }
 })
 
 onMounted(() => {
   getAllItemsList()
   getNonPaginatedLocationList()
-  getNonPaginatedSuppliersList()
-  getAllCountriesList()
 })
 
-// #------------- Methods -------------#
 const submitForm = async () => {
-  if (!inventoryForm.value) return
+  if (!recordForm.value) return
 
-  await inventoryForm.value.validate(async (valid) => {
+  await recordForm.value.validate(async (valid) => {
     if (valid) {
       if (crudOption.value === 'create') {
-        await saveInventory(form.value)
+        await saveInventoryRecord(form.value)
       } else {
-        await updateInventoryDetails({ ...form.value, id: inventoryId.value })
+        await updateInventoryRecordDetails({ ...form.value, id: recordId.value })
       }
     }
   })
 }
 
 const resetForm = () => {
-  inventoryForm.value?.resetFields()
+  recordForm.value?.resetFields()
   form.value = {
     item_id: '',
     location_id: '',
     quantity: 0,
-    reorder_level: 0,
+    reference: '',
+    notes: '',
     active: true,
   }
   crudOption.value = 'create'
-  inventoryId.value = null
+  recordId.value = null
 }
 </script>
 
 <template>
-  <div class="inventory-form">
+  <div class="inventory-record-form">
     <el-form
-      ref="inventoryForm"
+      ref="recordForm"
       :model="form"
       :rules="rules"
       label-width="120px"
@@ -131,8 +127,10 @@ const resetForm = () => {
               style="width: 100%"
             >
               <el-option
-                v-for="(item, i) in allItems" :key="i"
-                :label="`${item.description} (${item.barcode})`" :value="item.id"
+                v-for="(item, i) in allItems"
+                :key="i"
+                :label="`${item.description} (${item.barcode})`"
+                :value="item.id"
               />
             </el-select>
           </el-form-item>
@@ -147,43 +145,10 @@ const resetForm = () => {
               style="width: 100%"
             >
               <el-option
-                v-for="(item, i) in allLocations" :key="i"
-                :label="item.name" :value="item.id"
-              />
-            </el-select>
-          </el-form-item>
-        </el-col>
-      </el-row>
-
-      <el-row :gutter="20">
-        <el-col :span="12">
-          <el-form-item label="Supplier" prop="supplier_id">
-            <el-select
-              v-model="form.supplier_id"
-              placeholder="Select supplier"
-              clearable
-              filterable
-              style="width: 100%"
-            >
-              <el-option
-                v-for="(item, i) in allSuppliers" :key="i"
-                :label="`${item.name}`" :value="item.id"
-              />
-            </el-select>
-          </el-form-item>
-        </el-col>
-        <el-col :span="12">
-          <el-form-item label="Country" prop="country_id">
-            <el-select
-              v-model="form.country_id"
-              placeholder="Select country"
-              clearable
-              filterable
-              style="width: 100%"
-            >
-              <el-option
-                v-for="(item, i) in allCountries" :key="i"
-                :label="item.name" :value="item.id"
+                v-for="(item, i) in allLocations"
+                :key="i"
+                :label="item.name"
+                :value="item.id"
               />
             </el-select>
           </el-form-item>
@@ -202,6 +167,18 @@ const resetForm = () => {
           </el-form-item>
         </el-col>
         <el-col :span="12">
+          <el-form-item label="Reference" prop="reference">
+            <el-input
+              v-model="form.reference"
+              placeholder="PO, Invoice, etc."
+              clearable
+            />
+          </el-form-item>
+        </el-col>
+      </el-row>
+
+      <el-row :gutter="20">
+        <el-col :span="12">
           <el-form-item label="Status">
             <el-switch v-model="form.active" active-text="Active" inactive-text="Inactive" />
           </el-form-item>
@@ -209,17 +186,17 @@ const resetForm = () => {
       </el-row>
 
       <el-row :gutter="20">
-        <el-col :span="12">
-          <el-form-item label="Min Quantity" prop="reorder_level">
-            <el-input-number
-              v-model="form.reorder_level"
-              :min="0"
-              placeholder="Enter minimum quantity"
-              style="width: 100%"
+        <el-col :span="24">
+          <el-form-item label="Notes" prop="notes">
+            <el-input
+              v-model="form.notes"
+              type="textarea"
+              :rows="3"
+              placeholder="Enter notes (optional)"
+              maxlength="500"
+              show-word-limit
             />
           </el-form-item>
-        </el-col>
-        <el-col :span="12">
         </el-col>
       </el-row>
 
@@ -227,7 +204,7 @@ const resetForm = () => {
         <el-col :span="24" class="text-right">
           <el-button @click="resetForm">Reset</el-button>
           <el-button type="primary" @click="submitForm">
-            {{ crudOption === 'create' ? 'Create' : 'Update' }} Inventory
+            {{ crudOption === 'create' ? 'Create' : 'Update' }} Record
           </el-button>
         </el-col>
       </el-row>
@@ -236,7 +213,7 @@ const resetForm = () => {
 </template>
 
 <style scoped>
-.inventory-form {
+.inventory-record-form {
   padding: 20px;
 }
 </style>

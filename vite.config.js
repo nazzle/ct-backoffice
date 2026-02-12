@@ -21,5 +21,6 @@ export default defineConfig({
   },
   server: {
     port: 5010,
-  }
+  },
+  base: process.env.NODE_ENV === 'production' ? '/pos/' : '/'
 })

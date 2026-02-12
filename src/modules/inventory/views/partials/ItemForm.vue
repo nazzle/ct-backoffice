@@ -3,8 +3,6 @@ import { onMounted, ref, watch } from 'vue'
 import { useItem } from '@/modules/inventory/composables/useItem.js'
 import { useCategory } from '@/modules/inventory/composables/useCategory.js'
 import { useItemType } from '@/modules/reference-data/composables/useItemType.js'
-import { useSupplier } from '@/modules/supplier/composables/useSupplier.js'
-import { useCountry } from '@/modules/reference-data/composables/useCountry.js'
 import { useAgeGroup } from '@/modules/reference-data/composables/useAgeGroup.js'
 
 // #------------- Props / Emits -------------#
@@ -20,8 +18,6 @@ const props = defineProps({
 const { saveItemDetails, updateItemDetails, success } = useItem()
 const { allCategories, getNonPaginatedCategories } = useCategory()
 const { allItemTypes, getAllItemTypesList } = useItemType()
-const { allSuppliers, getNonPaginatedSuppliersList } = useSupplier()
-const { allCountries, getAllCountriesList } = useCountry()
 const { allAgeGroups, getAllAgeGroupsList } = useAgeGroup()
 const itemForm = ref(null)
 const crudOption = ref('create')
@@ -35,8 +31,6 @@ const form = ref({
   selling_price: 0,
   category_id: '',
   type_id: '',
-  supplier_id: '',
-  country_id: '',
   gender: '',
   age_id: '',
   active: true,
@@ -53,8 +47,6 @@ const rules = {
   ],
   category_id: [{ required: true, message: 'Item category is required', trigger: 'change' }],
   type_id: [{ required: true, message: 'Item type is required', trigger: 'change' }],
-  supplier_id: [{ required: true, message: 'Item supplier is required', trigger: 'change' }],
-  country_id: [{ required: true, message: 'Item country is required', trigger: 'change' }],
   gender: [{ required: true, message: 'Item gender is required', trigger: 'change' }],
   age_id: [{ required: true, message: 'Item age group is required', trigger: 'change' }],
 }
@@ -77,8 +69,6 @@ watch(
         selling_price: 0,
         category_id: '',
         type_id: '',
-        supplier_id: '',
-        country_id: '',
         gender: '',
         age_id: '',
         active: true,
@@ -99,8 +89,6 @@ onMounted(() => {
   getNonPaginatedCategories()
   getAllItemTypesList()
   getAllAgeGroupsList()
-  getAllCountriesList()
-  getNonPaginatedSuppliersList()
 })
 
 // #------------- Methods -------------#
@@ -128,8 +116,6 @@ const resetForm = () => {
     selling_price: 0,
     category_id: '',
     type_id: '',
-    supplier_id: '',
-    country_id: '',
     gender: '',
     age_id: '',
     active: true,
@@ -196,41 +182,6 @@ const resetForm = () => {
             >
               <el-option
                 v-for="(item, i) in allItemTypes" :key="i"
-                :label="item.name" :value="item.id"
-              />
-            </el-select>
-          </el-form-item>
-        </el-col>
-      </el-row>
-
-      <el-row :gutter="20">
-        <el-col :span="12">
-          <el-form-item label="Item Supplier" prop="supplier_id">
-            <el-select
-              v-model="form.supplier_id"
-              placeholder="Select supplier"
-              filterable
-              clearable
-              style="width: 100%"
-            >
-              <el-option
-                v-for="(item, i) in allSuppliers" :key="i"
-                :label="item.name" :value="item.id"
-              />
-            </el-select>
-          </el-form-item>
-        </el-col>
-        <el-col :span="12">
-          <el-form-item label="Item Country" prop="country_id">
-            <el-select
-              v-model="form.country_id"
-              placeholder="Select item type"
-              filterable
-              clearable
-              style="width: 100%"
-            >
-              <el-option
-                v-for="(item, i) in allCountries" :key="i"
                 :label="item.name" :value="item.id"
               />
             </el-select>
