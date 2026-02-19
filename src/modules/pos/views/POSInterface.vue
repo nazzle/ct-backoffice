@@ -97,7 +97,7 @@ const formattedTime = computed(() => {
 // Methods
 const handleBarcodeSearch = async () => {
   if (!barcodeInput.value) return
-  const item = await pos.scanBarcode(barcodeInput.value, cart.selectedLocation.value?.id)
+  const item = await pos.scanBarcode(barcodeInput.value, myProfile.value?.location_id)
   console.log('barcode item data: ',item)
   if (item) {
     cart.addToCart(item, 1)
@@ -107,7 +107,7 @@ const handleBarcodeSearch = async () => {
 
 const handleItemSearch = async () => {
   if (!searchQuery.value) return
-  const item = await pos.searchPOSItems(searchQuery.value, cart.selectedLocation.value?.id)
+  const item = await pos.searchPOSItems(searchQuery.value, myProfile.value?.location_id)
   if (item) {
     cart.addToCart(item, 1)
   }
