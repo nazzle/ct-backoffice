@@ -3,7 +3,7 @@ import api from '@/api/axios.js'
 // POS specific endpoints
 export const searchItems = (data) =>
   api.get(`/inventories/search`, {
-    params: data,
+    params: { location_id: data.location_id, keyword: data.keyword },
   })
 
 export const getItemByBarcode = (data) =>

@@ -1,5 +1,6 @@
 <script setup>
 import { onMounted, ref, watch } from 'vue'
+import { ElMessage } from 'element-plus'
 import { useItem } from '@/modules/inventory/composables/useItem.js'
 import { useCategory } from '@/modules/inventory/composables/useCategory.js'
 import { useItemType } from '@/modules/reference-data/composables/useItemType.js'
@@ -22,6 +23,7 @@ const { allAgeGroups, getAllAgeGroupsList } = useAgeGroup()
 const itemForm = ref(null)
 const crudOption = ref('create')
 const itemId = ref(null)
+const imagePreview = ref('')
 
 const form = ref({
   barcode: '',
@@ -59,6 +61,7 @@ watch(
       form.value = { ...newVal }
       itemId.value = newVal.id
       crudOption.value = 'update'
+      imagePreview.value = newVal.item_image || ''
     } else {
       crudOption.value = 'create'
       form.value = {
@@ -74,6 +77,7 @@ watch(
         active: true,
       }
       itemId.value = null
+      imagePreview.value = ''
     }
   },
   { immediate: true },
@@ -122,6 +126,77 @@ const resetForm = () => {
   }
   crudOption.value = 'create'
   itemId.value = null
+  imagePreview.value = ''
+}
+
+/**
+ * Compress image file to a JPEG data URL.
+ * Limits the maximum dimension to 800px and applies quality compression.
+ */
+const compressImage = (file, quality = 0.7, maxDimension = 800) => {
+  return new Promise((resolve, reject) => {
+    const reader = new FileReader()
+    reader.onload = (e) => {
+      const img = new Image()
+      img.onload = () => {
+        const canvas = document.createElement('canvas')
+        let { width, height } = img
+
+        // Maintain aspect ratio while limiting max dimension
+        if (width > height && width > maxDimension) {
+          height = (height * maxDimension) / width
+          width = maxDimension
+        } else if (height > width && height > maxDimension) {
+          width = (width * maxDimension) / height
+          height = maxDimension
+        }
+
+        canvas.width = width
+        canvas.height = height
+        const ctx = canvas.getContext('2d')
+        if (!ctx) {
+          reject(new Error('Failed to get canvas context'))
+          return
+        }
+        ctx.drawImage(img, 0, 0, width, height)
+
+        const dataUrl = canvas.toDataURL('image/jpeg', quality)
+        resolve(dataUrl)
+      }
+      img.onerror = () => reject(new Error('Failed to load image'))
+      img.src = e.target?.result
+    }
+    reader.onerror = () => reject(new Error('Failed to read file'))
+    reader.readAsDataURL(file)
+  })
+}
+
+const handleImageChange = async (event) => {
+  const file = event.target.files?.[0]
+  if (!file) return
+
+  if (!file.type.startsWith('image/')) {
+    ElMessage.error('Please select an image file')
+    return
+  }
+
+  const isLt2M = file.size / 1024 / 1024 <= 2
+  if (!isLt2M) {
+    ElMessage.error('Image size must not exceed 2MB')
+    return
+  }
+
+  try {
+    const compressedDataUrl = await compressImage(file, 0.7)
+    form.value.item_image = compressedDataUrl
+    imagePreview.value = compressedDataUrl
+  } catch (error) {
+    console.error(error)
+    ElMessage.error('Failed to process image')
+  } finally {
+    // Reset the file input so selecting the same file again still triggers change
+    event.target.value = ''
+  }
 }
 </script>
 
@@ -136,7 +211,14 @@ const resetForm = () => {
         </el-col>
         <el-col :span="12">
           <el-form-item label="Item Image" prop="item_image">
-            <el-input v-model="form.item_image" placeholder="Upload Image" clearable />
+            <input
+              type="file"
+              accept="image/*"
+              @change="handleImageChange"
+            />
+            <div v-if="imagePreview" class="mt-2">
+              <img :src="imagePreview" alt="Item preview" class="item-image-preview" />
+            </div>
           </el-form-item>
         </el-col>
       </el-row>
@@ -261,5 +343,13 @@ const resetForm = () => {
 <style scoped>
 .item-form {
   padding: 20px;
+}
+
+.item-image-preview {
+  max-width: 120px;
+  max-height: 120px;
+  border-radius: 4px;
+  border: 1px solid #ebeef5;
+  object-fit: cover;
 }
 </style>
