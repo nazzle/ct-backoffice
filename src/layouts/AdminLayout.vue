@@ -59,7 +59,7 @@ const logout = () => {
           <RouterLink to="/sales/index" v-if="hasPermission('VIEW_SALES_MODULE')" class="text-gray-300 hover:text-white transition-colors duration-200">Sales</RouterLink>
           <RouterLink to="/inventory/index" v-if="hasPermission('VIEW_INVENTORY_MODULE')" class="text-gray-300 hover:text-white transition-colors duration-200">Inventory</RouterLink>
           <RouterLink to="/suppliers/index" v-if="hasPermission('VIEW_SUPPLIERS_MODULE')" class="text-gray-300 hover:text-white transition-colors duration-200">Suppliers</RouterLink>
-          <RouterLink to="/reference-data/index" v-if="hasPermission('VIEW_CONFIGURATIONS')" class="text-gray-300 hover:text-white transition-colors duration-200">Reference Data</RouterLink>
+          <RouterLink to="/reference-data/index" v-if="hasPermission('VIEW_REFERENCE_DATA')" class="text-gray-300 hover:text-white transition-colors duration-200">Reference Data</RouterLink>
           <RouterLink to="/human-resources/index" v-if="hasPermission('VIEW_HR_MODULE')" class="text-gray-300 hover:text-white transition-colors duration-200">Employees</RouterLink>
           <a v-if="hasPermission('VIEW_REPORTS_MODULE')" href="#" class="text-gray-300 hover:text-white transition-colors duration-200">Reports</a>
           <RouterLink to="/configurations/index" v-if="hasPermission('VIEW_CONFIGURATIONS_MODULE')" class="text-gray-300 hover:text-white transition-colors duration-200">Configurations</RouterLink>
