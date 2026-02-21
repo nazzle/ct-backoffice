@@ -43,7 +43,7 @@ const modules = [
     name: 'Reference Data',
     logo: referenceDataSvg,
     path: '/reference-data/index',
-    permissions: 'VIEW_CONFIGURATIONS',
+    permissions: 'VIEW_REFERENCE_DATA',
   },
   {
     name: 'Restocking',
