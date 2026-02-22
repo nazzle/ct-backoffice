@@ -12,13 +12,12 @@ const emit = defineEmits(['openItemModal'])
 // #------------- Reactive & Refs State -------------#
 const columns = [
   { key: 'id', label: 'S/N', type: 'index' },
-  { key: 'active', label: 'Status' },
+  { key: 'description', label: 'Description' },
   { key: 'barcode', label: 'Barcode' },
   { key: 'buying_price', label: 'Buying Price' },
   { key: 'selling_price', label: 'Selling Price' },
-  { key: 'type', label: 'Type' },
-  { key: 'description', label: 'Description' },
   { key: 'created_at', label: 'Created At' },
+  { key: 'active', label: 'Status' },
 ]
 
 const { pagination, items, loading, success, fetchItems, activateDeactivateItem, removeItem } =
@@ -118,6 +117,11 @@ defineExpose({
       style="width: 100%"
       v-loading="loading"
     >
+      <el-table-column label="Image">
+        <template #default="scope">
+          <img :src="scope.row.item_image_url"  alt="No Image" width="120px" />
+        </template>
+      </el-table-column>
       <el-table-column label="Actions" width="200">
         <template #default="scope">
           <el-button
