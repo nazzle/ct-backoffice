@@ -258,7 +258,7 @@ const clearCart = async () => {
     <div class="pos-header">
       <div class="header-left">
         <h2 class="pos-title">
-          <Icon icon="mdi:point-of-sale" width="32" height="32" /> Point of Sale
+          <Icon icon="mdi:point-of-sale" width="30" height="30" /> Point of Sale
         </h2>
       </div>
       <div class="header-center">
@@ -327,8 +327,8 @@ const clearCart = async () => {
           >
             <div class="product-image">
               <img
-                v-if="item?.image"
-                :src="item?.item?.image"
+                v-if="item?.item?.item_image_url"
+                :src="item?.item?.item_image_url"
                 :alt="item?.item?.description"
                 @error="(e) => (e.target.src = '/placeholder-product.png')"
               />
@@ -380,30 +380,34 @@ const clearCart = async () => {
           </div>
           <div v-for="item in cart.cartItems.value" :key="item.id" class="cart-item">
             <div class="item-details">
-              <div class="item-name">{{ item?.item?.description }}</div>
-              <div class="item-price">{{ item?.item?.selling_price }} each</div>
+              <div class="item-name">
+                {{ item?.item?.description }}
+                <span class="item-price">@ {{ item?.item?.selling_price }}</span>
+              </div>
               <div v-if="item.discount > 0" class="item-discount">
                 Discount:
                 {{ item.discount_type === 'percentage' ? `${item.discount}%` : item.discount }}
               </div>
             </div>
             <div class="item-controls">
-              <el-input-number
-                v-model="item.quantity"
-                :min="1"
-                :max="999"
-                size="small"
-                @change="(val) => cart.updateQuantity(item.id, val)"
-              />
+              <div class="flex gap-2">
+                <el-button-group>
+                  <el-button size="small" plain @click="openItemDiscountDialog(item)">
+                    <Icon icon="mdi:percent" />
+                  </el-button>
+                  <el-button size="small" type="danger" plain @click="cart.removeFromCart(item.id)">
+                    <Icon icon="mdi:delete" />
+                  </el-button>
+                </el-button-group>
+                <el-input-number
+                  v-model="item.quantity"
+                  :min="1"
+                  :max="999"
+                  size="small"
+                  @change="(val) => cart.updateQuantity(item.id, val)"
+                />
+              </div>
               <div class="item-total">{{ cart.getItemTotal(item).toFixed(2) }}</div>
-              <el-button-group>
-                <el-button size="small" plain @click="openItemDiscountDialog(item)">
-                  <Icon icon="mdi:percent" />
-                </el-button>
-                <el-button size="small" type="danger" plain @click="cart.removeFromCart(item.id)">
-                  <Icon icon="mdi:delete" />
-                </el-button>
-              </el-button-group>
             </div>
           </div>
         </div>
@@ -664,7 +668,7 @@ const clearCart = async () => {
 
 .pos-header {
   background: white;
-  padding: 1rem 1.5rem;
+  padding: 0.3rem 1.5rem;
   display: flex;
   justify-content: space-between;
   align-items: center;
@@ -862,7 +866,7 @@ const clearCart = async () => {
 .cart-item {
   display: flex;
   justify-content: space-between;
-  padding: 1rem;
+  padding: 0.5rem 1rem;
   border: 1px solid #ebeef5;
   border-radius: 8px;
   margin-bottom: 0.75rem;
@@ -891,7 +895,7 @@ const clearCart = async () => {
 .item-discount {
   font-size: 0.85rem;
   color: #67c23a;
-  margin-top: 0.25rem;
+  margin-top: 0.2rem;
 }
 
 .item-controls {
@@ -908,7 +912,7 @@ const clearCart = async () => {
 }
 
 .cart-summary {
-  padding: 1rem;
+  padding: 0.5rem 1rem;
   border-top: 2px solid #ebeef5;
   background: #fafafa;
 }
@@ -916,7 +920,7 @@ const clearCart = async () => {
 .summary-row {
   display: flex;
   justify-content: space-between;
-  padding: 0.5rem 0;
+  padding: 0.2rem 0;
   font-size: 0.95rem;
 }
 
